@@ -7,14 +7,21 @@ class Chat implements MessageComponentInterface {
     protected $clients;
 
     public function __construct() {
-        $this->clients = new \SplObjectStorage;
+        
+        $this->clients = array();
     }
 
     public function onOpen(ConnectionInterface $conn) {
         // Store the new connection to send messages to later
-        $this->clients->attach($conn);
-
+        $this->clients[]=$conn;
         echo "New connection! ({$conn->resourceId})\n";
+        if (count($this->clients)==2){
+            $first = rand(0,1);
+            $this->clients[$first]->send("START");
+            echo "Game started: player $first is first";
+        }
+
+        
     }
 
     public function onMessage(ConnectionInterface $from, $msg) {
