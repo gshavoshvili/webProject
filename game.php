@@ -12,6 +12,7 @@
 //Game variables
 var canvas = document.getElementById("Canvas");
 var ctx = canvas.getContext("2d");
+var cellWidth = 25;
 var clicked = [];
 var myTurn = false;
 
@@ -20,7 +21,6 @@ var conn = new WebSocket('ws://localhost:8080');
 conn.onopen = function(e) {
     console.log("Connection established!");
     var i = 1;
-    //setInterval(function(){conn.send(i); i++;},100);
 };
 
 conn.onmessage = function(e) {
@@ -37,8 +37,30 @@ conn.onmessage = function(e) {
 
 
 //Game logic
+var myField = new Array(10);
+for (var i = 0; i<10; i++){
+    myField[i]=new Array(10);
+    for(var j = 0; j<10; j++){
+        myField[i][j]=0;
+    }
+}
+var enemyField = new Array(10);
+for (var i = 0; i<10; i++){
+    enemyField[i]=new Array(10);
+    for(var j = 0; j<10; j++){
+        enemyField[i][j]=0;
+    }
+}
+
+
+
 canvas.addEventListener("click", clickHandler, false);
 function clickHandler(e){
+    if (e.offsetX>25.5 && e.offsetX<275.5 && e.offsetY>250.5 && e.offsetY<500.5){
+        var x = e.offsetX-25.5;
+        var y = e.offsetY-250.5;
+        console.log("[" + Math.floor(x/cellWidth) +", " + Math.floor(y/cellWidth)+ "]");
+    }
     if(myTurn) {
     var click = [e.offsetX,e.offsetY];
     conn.send(JSON.stringify(click));
@@ -47,8 +69,42 @@ function clickHandler(e){
     }
 }
 
+
+
+
 function draw(){
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    //Make it look like a page of a notebook
+    ctx.lineWidth=1;
+    ctx.strokeStyle="black";
+    var currentlyAt = cellWidth;
+    while( currentlyAt!=canvas.width){
+        ctx.beginPath()
+        ctx.moveTo(currentlyAt+0.5,0);
+        ctx.lineTo(currentlyAt+0.5,canvas.height);
+        ctx.stroke();
+        currentlyAt+=cellWidth;
+    }
+    currentlyAt = cellWidth;
+    while( currentlyAt!=canvas.width){
+        ctx.beginPath()
+        ctx.moveTo(0,currentlyAt+0.5);
+        ctx.lineTo(canvas.width,currentlyAt+0.5);
+        ctx.stroke();
+        currentlyAt+=cellWidth;
+    }
+    
+    //Draw the players' zones 
+    ctx.lineWidth=3;
+    ctx.strokeStyle="darkblue";
+    ctx.strokeRect(25.5,250.5,250,250);
+    ctx.strokeRect(325.5,250.5,250,250);
+
+
+
+
+
     clicked.forEach(function(e){
         ctx.fillRect(e[0],e[1],50,50);
     })
