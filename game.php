@@ -72,7 +72,12 @@ function clickHandler(e){
         var y = e.offsetY-250.5;
         var gridX = Math.floor(x/cellWidth);
         var gridY = Math.floor(y/cellWidth);
-        enemyField[gridX][gridY] = -1;
+        if (enemyField[gridX][gridY] == -1){
+            enemyField[gridX][gridY] = 1;
+        }
+        else {
+            enemyField[gridX][gridY] = -1;
+            }
         console.log(enemyField);
     }
     if(myTurn) {
@@ -117,10 +122,22 @@ function draw(){
     ctx.fillStyle="darkblue";
     for (var i = 0; i<10; i++){
         for(var j = 0; j<10; j++){
+            var centerX = 325.5 + 25*i + 12.5;
+            var centerY = 250.5 + 25*j + 12.5;
+            var crossHalfWidth = 9;
             if(enemyField[i][j] == -1){
                 ctx.beginPath();
-                ctx.arc(325.5 + 25*i + 12.5, 250.5 + 25*j + 12.5, dotRadius, 0, Math.PI * 2);
+                ctx.arc(centerX, centerY, dotRadius, 0, Math.PI * 2);
                 ctx.fill();
+            }
+            else if (enemyField[i][j] == 1){
+                ctx.beginPath();
+                ctx.moveTo(centerX - crossHalfWidth, centerY - crossHalfWidth);
+                ctx.lineTo(centerX + crossHalfWidth, centerY + crossHalfWidth);
+
+                ctx.moveTo(centerX + crossHalfWidth, centerY - crossHalfWidth);
+                ctx.lineTo(centerX - crossHalfWidth, centerY + crossHalfWidth);
+                ctx.stroke();
             }
         }
     }
