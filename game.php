@@ -13,6 +13,7 @@
 var canvas = document.getElementById("Canvas");
 var ctx = canvas.getContext("2d");
 var cellWidth = 25;
+var dotRadius = 3.5;
 var clicked = [];
 var myTurn = false;
 
@@ -37,29 +38,42 @@ conn.onmessage = function(e) {
 
 
 //Game logic
-var myField = new Array(10);
-for (var i = 0; i<10; i++){
-    myField[i]=new Array(10);
-    for(var j = 0; j<10; j++){
-        myField[i][j]=0;
-    }
-}
-var enemyField = new Array(10);
-for (var i = 0; i<10; i++){
-    enemyField[i]=new Array(10);
-    for(var j = 0; j<10; j++){
-        enemyField[i][j]=0;
-    }
-}
+var myField = [ 
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0]
+]
+var enemyField = [ 
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0]
+]
 
 
 
 canvas.addEventListener("click", clickHandler, false);
 function clickHandler(e){
-    if (e.offsetX>25.5 && e.offsetX<275.5 && e.offsetY>250.5 && e.offsetY<500.5){
-        var x = e.offsetX-25.5;
+    if (e.offsetX>325.5 && e.offsetX<575.5 && e.offsetY>250.5 && e.offsetY<500.5){
+        var x = e.offsetX-325.5;
         var y = e.offsetY-250.5;
-        console.log("[" + Math.floor(x/cellWidth) +", " + Math.floor(y/cellWidth)+ "]");
+        var gridX = Math.floor(x/cellWidth);
+        var gridY = Math.floor(y/cellWidth);
+        enemyField[gridX][gridY] = -1;
+        console.log(enemyField);
     }
     if(myTurn) {
     var click = [e.offsetX,e.offsetY];
@@ -100,7 +114,16 @@ function draw(){
     ctx.strokeStyle="darkblue";
     ctx.strokeRect(25.5,250.5,250,250);
     ctx.strokeRect(325.5,250.5,250,250);
-
+    ctx.fillStyle="darkblue";
+    for (var i = 0; i<10; i++){
+        for(var j = 0; j<10; j++){
+            if(enemyField[i][j] == -1){
+                ctx.beginPath();
+                ctx.arc(325.5 + 25*i + 12.5, 250.5 + 25*j + 12.5, dotRadius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+    }
 
 
 
