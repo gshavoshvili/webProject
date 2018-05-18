@@ -18,8 +18,17 @@
 	for ($i = 0; $i < 8; ++$i) {
 		$pieces []= $keyspace[random_int(0, $max)];
 	}
-	$_SESSION['link'] = implode('', $pieces);
-	echo $_SESSION['link'];
+	if (!isset($_SESSION['link1'])) {
+	$_SESSION['link1'] = implode('', $pieces);}
+	elseif (!isset($_SESSION['link2'])) {
+		$_SESSION['link2'] = implode('', $pieces);}
+	elseif (!isset($_SESSION['link3'])) {
+		$_SESSION['link3'] = implode('', $pieces);}
+	elseif (!isset($_SESSION['link4'])) {
+		$_SESSION['link4'] = implode('', $pieces);}
+	elseif (!isset($_SESSION['link5'])) {
+		$_SESSION['link5'] = implode('', $pieces);}		
+	else echo "You can't create more games";
 	exit();
  }
 
@@ -69,15 +78,16 @@
 		url: "index.php",
 		data: { action: "abc" }
 		}).done(function(msg) {
-		alert( "Data Saved: " + msg );
+		if (msg=="You can't create more games") {
+		alert( msg );}
+		else {
 		window.location.href = "game.php";
+		}
 		});
   	 });
 
 	
 	</script>
-	<div id="uid" style="display:none">
-	<p></p>
 	</div>
 </div>
 
