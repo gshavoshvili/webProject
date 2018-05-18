@@ -263,8 +263,11 @@ function draw(){
     for (var i = 0; i<10; i++){
         for(var j = 0; j<10; j++){
             var cell = enemyField[i][j];
-            var centerX = enemyFieldXOffset + 25*i + 12.5;
-            var centerY = 250.5 + 25*j + 12.5;
+            var cornerX = enemyFieldXOffset + 25*i;
+            var cornerY = 250.5 + 25*j;
+            var centerX = cornerX + 12.5;
+            var centerY = cornerY + 12.5;
+
             
             if(cell == -1){
                 ctx.fillStyle="darkblue";
@@ -278,6 +281,30 @@ function draw(){
                 }
                 else {
                     ctx.strokeStyle="black";
+                    if( i>0 &&  enemyField[i-1][j]<=0 ){
+                    ctx.beginPath();
+                    ctx.moveTo(cornerX,cornerY-1.5);
+                    ctx.lineTo(cornerX,cornerY+cellWidth+1.5);
+                    ctx.stroke();
+                }
+                if( i<9 &&  enemyField[i+1][j]<=0 ){
+                    ctx.beginPath();
+                    ctx.moveTo(cornerX+25,cornerY-1.5);
+                    ctx.lineTo(cornerX+25,cornerY+cellWidth+1.5);
+                    ctx.stroke();
+                }
+                if( j>0 &&  enemyField[i][j-1]<=0 ){
+                    ctx.beginPath();
+                    ctx.moveTo(cornerX-1.5,cornerY);
+                    ctx.lineTo(cornerX+cellWidth+1.5,cornerY);
+                    ctx.stroke();
+                }
+                if( j<9 &&  enemyField[i][j+1]<=0 ){
+                    ctx.beginPath();
+                    ctx.moveTo(cornerX-1.5,cornerY+25);
+                    ctx.lineTo(cornerX+cellWidth+1.5,cornerY+25);
+                    ctx.stroke();
+                }
                 }
                 ctx.beginPath();
                 ctx.moveTo(centerX - crossHalfWidth, centerY - crossHalfWidth);
