@@ -22,9 +22,42 @@ var enemyFieldXOffset = 400.5;
 var cellWidth = 25;
 var dotRadius = 3.5;
 var crossHalfWidth = 9;
-var clicked = [];
 var myTurn = false;
 
+//Drag&Drop
+var dragging = null;
+var dragOffset = null;
+var ship = {
+initPos:  [200.5,200.5],
+pos: [200.5,200.5],
+width: cellWidth,
+height:cellWidth
+}
+
+
+canvas.addEventListener('mousedown',mouseDownHandler, false);
+function mouseDownHandler(e){
+    if (e.offsetX>ship.pos[0] && e.offsetX<ship.pos[0]+ship.width && e.offsetY>ship.pos[1] && e.offsetY<ship.pos[1]+ship.height){
+        dragging=ship;
+        dragOffset=[e.offsetX-ship.pos[0],e.offsetY-ship.pos[1]];
+    }
+}
+canvas.addEventListener('mousemove',mouseMoveHandler, false);
+function mouseMoveHandler(e){
+    if (dragging!=null){
+        dragging.pos=[e.offsetX-dragOffset[0],e.offsetY-dragOffset[1]];
+
+    }
+}
+canvas.addEventListener('mouseup',mouseUpHandler, false);
+function mouseUpHandler(e){
+    if(dragging!=null ){
+        if (!(dragging.pos[0]>myFieldXOffset && dragging.pos[0]<myFieldXOffset+250 && dragging.pos[1]>250.5 && dragging.pos[1]<500.5)){
+            dragging.pos=dragging.initPos;
+        }
+        dragging=null;
+    }
+}
 //WebSocket connection
 var conn = new WebSocket('ws://localhost:8080');
 conn.onopen = function(e) {
@@ -128,34 +161,52 @@ function clickHandler(e){
     }
 }
 
+function drawBG(){
+ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 
+ctx.fillStyle="white";
+ctx.fillRect(0, 0, canvas.width, canvas.height);
+ctx.lineWidth=1;
+ctx.strokeStyle="black";
+var currentlyAt = cellWidth;
+while( currentlyAt!=canvas.width){
+    ctx.beginPath()
+    ctx.moveTo(currentlyAt+0.5,0);
+    ctx.lineTo(currentlyAt+0.5,canvas.height);
+    ctx.stroke();
+    currentlyAt+=cellWidth;
+}
+currentlyAt = cellWidth;
+while( currentlyAt!=canvas.width){
+    ctx.beginPath()
+    ctx.moveTo(0,currentlyAt+0.5);
+    ctx.lineTo(canvas.width,currentlyAt+0.5);
+    ctx.stroke();
+    currentlyAt+=cellWidth;
+}
+
+}
+
+function drawCross(centerX,centerY,color){
+    ctx.strokeStyle=color;
+    ctx.beginPath();
+    ctx.moveTo(centerX - crossHalfWidth, centerY - crossHalfWidth);
+    ctx.lineTo(centerX + crossHalfWidth, centerY + crossHalfWidth);
+    ctx.moveTo(centerX + crossHalfWidth, centerY - crossHalfWidth);
+    ctx.lineTo(centerX - crossHalfWidth, centerY + crossHalfWidth);
+    ctx.stroke();
+}
 
 function draw(){
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     //Make it look like a page of a notebook
-    ctx.fillStyle="white";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.lineWidth=1;
-    ctx.strokeStyle="black";
-    var currentlyAt = cellWidth;
-    while( currentlyAt!=canvas.width){
-        ctx.beginPath()
-        ctx.moveTo(currentlyAt+0.5,0);
-        ctx.lineTo(currentlyAt+0.5,canvas.height);
-        ctx.stroke();
-        currentlyAt+=cellWidth;
-    }
-    currentlyAt = cellWidth;
-    while( currentlyAt!=canvas.width){
-        ctx.beginPath()
-        ctx.moveTo(0,currentlyAt+0.5);
-        ctx.lineTo(canvas.width,currentlyAt+0.5);
-        ctx.stroke();
-        currentlyAt+=cellWidth;
-    }
+    drawBG();
     
+    ctx.strokeStyle="darkblue"
+    ctx.lineWidth=3;
+    ctx.strokeRect(ship.pos[0],ship.pos[1],ship.width,ship.height );
+
     //Draw the players' zones 
     ctx.lineWidth=3;
     ctx.strokeStyle="darkblue";
@@ -226,18 +277,12 @@ function draw(){
 
                 if (cell == 12 || cell ==13){
                 if(cell==12){
-                    ctx.strokeStyle="red";
+                    drawCross(centerX,centerY,'red');
                 }
                 else {
-                    ctx.strokeStyle="black";
+                    drawCross(centerX,centerY,'black');
                 }
-                ctx.beginPath();
-                ctx.moveTo(centerX - crossHalfWidth, centerY - crossHalfWidth);
-                ctx.lineTo(centerX + crossHalfWidth, centerY + crossHalfWidth);
 
-                ctx.moveTo(centerX + crossHalfWidth, centerY - crossHalfWidth);
-                ctx.lineTo(centerX - crossHalfWidth, centerY + crossHalfWidth);
-                ctx.stroke();
             }
 
             } 
@@ -277,7 +322,7 @@ function draw(){
             }
             else if (cell == 2 || cell ==3){
                 if(cell==2){
-                    ctx.strokeStyle="red";
+                    drawCross(centerX,centerY,'red');
                 }
                 else {
                     ctx.strokeStyle="black";
@@ -305,14 +350,9 @@ function draw(){
                     ctx.lineTo(cornerX+cellWidth+1.5,cornerY+25);
                     ctx.stroke();
                 }
+                drawCross(centerX,centerY,'black');
                 }
-                ctx.beginPath();
-                ctx.moveTo(centerX - crossHalfWidth, centerY - crossHalfWidth);
-                ctx.lineTo(centerX + crossHalfWidth, centerY + crossHalfWidth);
-
-                ctx.moveTo(centerX + crossHalfWidth, centerY - crossHalfWidth);
-                ctx.lineTo(centerX - crossHalfWidth, centerY + crossHalfWidth);
-                ctx.stroke();
+                
             }
         }
     }
@@ -320,9 +360,7 @@ function draw(){
 
 
 
-    clicked.forEach(function(e){
-        ctx.fillRect(e[0],e[1],50,50);
-    })
+
     requestAnimationFrame(draw);
 }
 draw();
