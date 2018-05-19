@@ -46,7 +46,11 @@ canvas.addEventListener('mousemove',mouseMoveHandler, false);
 function mouseMoveHandler(e){
     if (dragging!=null){
         dragging.pos=[e.offsetX-dragOffset[0],e.offsetY-dragOffset[1]];
-
+        if ((dragging.pos[0]>myFieldXOffset && dragging.pos[0]<myFieldXOffset+250 && dragging.pos[1]>250.5 && dragging.pos[1]<500.5)){
+            var x = Math.floor((dragging.pos[0]-myFieldXOffset+cellWidth/2)/cellWidth);
+            var y = Math.floor((dragging.pos[1]-250.5+cellWidth/2)/cellWidth);
+            myField[x][y]=1;
+        }
     }
 }
 canvas.addEventListener('mouseup',mouseUpHandler, false);
