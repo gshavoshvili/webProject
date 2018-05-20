@@ -18,9 +18,11 @@
 	for ($i = 0; $i < 8; ++$i) {
 		$pieces []= $keyspace[random_int(0, $max)];
 	}
-	if (!isset($_SESSION['link'])) {
-	$_SESSION['link'] = implode('', $pieces);}
-	$specialPath = getenv('BASE_PATH'); echo($specialPath);
+
+	$_SESSION['link'] = implode('', $pieces);
+	echo $_SESSION['link'];
+	
+	
 	exit();
  }
 
@@ -67,11 +69,7 @@
 		url: "index.php",
 		data: { action: "abc" }
 		}).done(function(msg) {
-		if (msg=="You can't create more games") {
-		alert( msg );}
-		else {
-		window.location.href = "game.php";
-		}
+		window.location.href = "game/"+msg;
 		});
   	 });
 
