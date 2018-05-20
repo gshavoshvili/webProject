@@ -27,37 +27,151 @@ var myTurn = false;
 //Drag&Drop
 var dragging = null;
 var dragOffset = null;
-var ship = {
-initPos:  [200.5,200.5],
-pos: [200.5,200.5],
+var ships = [{
+initPos:  [200.5,100.5],
+pos: [200.5,100.5],
 width: cellWidth,
-height:cellWidth
+height:cellWidth*4,
+cell:null, // RENAME
+cells: [],
+around: [],
+rot:1
+},
+{
+initPos:  [250.5,100.5],
+pos: [250.5,100.5],
+width: cellWidth*3,
+height:cellWidth,
+cell:null, // RENAME
+cells: [],
+around: [],
+rot:0
+},
+{
+initPos:  [250.5,175.5],
+pos: [250.5,175.5],
+width: cellWidth*3,
+height:cellWidth,
+cell:null, // RENAME
+cells: [],
+around: [],
+rot:0
 }
+
+
+]
 
 
 canvas.addEventListener('mousedown',mouseDownHandler, false);
 function mouseDownHandler(e){
-    if (e.offsetX>ship.pos[0] && e.offsetX<ship.pos[0]+ship.width && e.offsetY>ship.pos[1] && e.offsetY<ship.pos[1]+ship.height){
+    for(var i = 0; i<ships.length;i++){
+        var ship=ships[i];
+        if (e.offsetX>ship.pos[0] && e.offsetX<ship.pos[0]+ship.width && e.offsetY>ship.pos[1] && e.offsetY<ship.pos[1]+ship.height){
         dragging=ship;
         dragOffset=[e.offsetX-ship.pos[0],e.offsetY-ship.pos[1]];
+        dragging.around.forEach(function(e){
+            myField[e[0]][e[1]]++;
+        });
+        dragging.around=[];
+        dragging.cells.forEach(function(e){
+            myField[e[0]][e[1]]=0;
+        })
+        dragging.cell=dragging.cells[0];
+        break;
+        }
     }
+    
 }
 canvas.addEventListener('mousemove',mouseMoveHandler, false);
 function mouseMoveHandler(e){
     if (dragging!=null){
+        if(dragging.cell!=null){
+            myField[dragging.cell[0]][dragging.cell[1]] = 0;
+            dragging.cell=null;
+            dragging.cells=[];
+        }
+        
         dragging.pos=[e.offsetX-dragOffset[0],e.offsetY-dragOffset[1]];
-        if ((dragging.pos[0]>myFieldXOffset && dragging.pos[0]<myFieldXOffset+250 && dragging.pos[1]>250.5 && dragging.pos[1]<500.5)){
+        if (dragging.pos[0]>myFieldXOffset-cellWidth/2 && dragging.pos[0]<myFieldXOffset-cellWidth/2+250-(dragging.width-25) && dragging.pos[1]>250.5-cellWidth/2 && dragging.pos[1]<500.5-cellWidth/2-(dragging.height-25)){
             var x = Math.floor((dragging.pos[0]-myFieldXOffset+cellWidth/2)/cellWidth);
             var y = Math.floor((dragging.pos[1]-250.5+cellWidth/2)/cellWidth);
-            myField[x][y]=1;
+            var canPlace = true;
+            dragging.cell = [x,y];
+            dragging.cells=[];
+            for (var i = 0; i<((dragging.rot==0)?dragging.width:dragging.height)/25;i++){
+                if(myField[dragging.cell[0]+((dragging.rot==0)?i:0)][dragging.cell[1]+((dragging.rot==1)?i:0)]==0){
+                    dragging.cells.push([dragging.cell[0]+((dragging.rot==0)?i:0),dragging.cell[1]+((dragging.rot==1)?i:0)])
+                }
+                else{
+                    canPlace = false;
+                    break;
+                }
+               }
+            if(!canPlace){
+                dragging.cells=[];
+                dragging.cell=null;
+            }
         }
     }
 }
 canvas.addEventListener('mouseup',mouseUpHandler, false);
 function mouseUpHandler(e){
     if(dragging!=null ){
-        if (!(dragging.pos[0]>myFieldXOffset && dragging.pos[0]<myFieldXOffset+250 && dragging.pos[1]>250.5 && dragging.pos[1]<500.5)){
+        if (dragging.cell==null){
             dragging.pos=dragging.initPos;
+        }
+        else{
+            dragging.pos=[dragging.cell[0]*25+myFieldXOffset,dragging.cell[1]*25+250.5]
+            
+            // dots around
+            if(dragging.rot==0){
+                for (var i = ((dragging.cell[0])>0?-1:0); i<= dragging.width/25 -((dragging.cell[0]+dragging.width/25<10)?0:1) ;i++){
+                   if(dragging.cell[1]>0){
+                        dragging.around.push([dragging.cell[0]+i,dragging.cell[1]-1]);
+                        myField[dragging.cell[0]+i][dragging.cell[1]-1]--;
+                   }
+                   if(dragging.cell[1]<9) {
+                       dragging.around.push([dragging.cell[0]+i,dragging.cell[1]+1]);
+                       myField[dragging.cell[0]+i][dragging.cell[1]+1]--;
+                   }
+                }
+            if(dragging.cell[0]>0){
+                dragging.around.push([dragging.cell[0]-1,dragging.cell[1]]);
+                myField[dragging.cell[0]-1][dragging.cell[1]]--;
+            } 
+            if(dragging.cell[0]+dragging.width/25<10){
+                dragging.around.push([dragging.cell[0]+dragging.width/25,dragging.cell[1]]);
+                myField[dragging.cell[0]+dragging.width/25][dragging.cell[1]]--;
+            } 
+
+            } 
+
+            else{
+                for (var i = ((dragging.cell[1])>0?-1:0); i<= dragging.height/25 -((dragging.cell[1]+dragging.height/25<10)?0:1) ;i++){
+                   if(dragging.cell[0]>0){
+                        dragging.around.push([dragging.cell[0]-1,dragging.cell[1]+i]);
+                        myField[dragging.cell[0]-1][dragging.cell[1]+i]--;
+                   } 
+                   if(dragging.cell[0]<9){
+                        dragging.around.push([dragging.cell[0]+1,dragging.cell[1]+i]);
+                        myField[dragging.cell[0]+1][dragging.cell[1]+i]--;
+                   } 
+                }
+            if(dragging.cell[1]>0){
+                dragging.around.push([dragging.cell[0],dragging.cell[1]-1]);
+                myField[dragging.cell[0]][dragging.cell[1]-1]--;
+            } 
+            if(dragging.cell[1]+dragging.height/25<10) {
+                dragging.around.push([dragging.cell[0],dragging.cell[1]+dragging.height/25])
+                myField[dragging.cell[0]][dragging.cell[1]+dragging.height/25]--;
+            }
+            }
+            // end dots      
+            
+            dragging.cells.forEach(function(e){
+                myField[e[0]][e[1]]=1;
+            });
+            dragging.cell=null;
         }
         dragging=null;
     }
@@ -104,6 +218,22 @@ by hand
 
 */
 var myFieldTransposed = [ 
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0]
+];
+
+
+
+
+/*                        [ 
 [1,12,12,0,0,0,-1,0,0,0],
 [0,0,0,0,0,0,0,1,0,0],
 [-1,-1,-1,1,1,0,0,1,0,0],
@@ -114,7 +244,7 @@ var myFieldTransposed = [
 [0,0,0,1,0,0,0,0,0,0],
 [0,0,0,1,0,0,-1,0,0,0],
 [0,0,0,1,0,0,0,0,0,0]
-]
+];*/
 
 var myField = [];
 for(var i = 0; i < myFieldTransposed.length; i++){
@@ -207,10 +337,7 @@ function draw(){
     //Make it look like a page of a notebook
     drawBG();
     
-    ctx.strokeStyle="darkblue"
-    ctx.lineWidth=3;
-    ctx.strokeRect(ship.pos[0],ship.pos[1],ship.width,ship.height );
-
+    
     //Draw the players' zones 
     ctx.lineWidth=3;
     ctx.strokeStyle="darkblue";
@@ -241,7 +368,7 @@ function draw(){
             var cornerY = 250.5 + 25*j;
             var centerX = cornerX + 12.5;
             var centerY = cornerY + 12.5;
-            if(cell == -1){
+            if(cell <0){
                 ctx.fillStyle="darkblue";
                 ctx.beginPath();
                 ctx.arc(centerX, centerY, dotRadius, 0, Math.PI * 2);
@@ -294,9 +421,28 @@ function draw(){
     }
 
 
+    ctx.strokeStyle="darkblue"
+    ctx.lineWidth=3;
+    
+    for(var i = 0; i<ships.length;i++){
+        var ship = ships[i]; 
+        if(ship.cell==null){
+        ctx.strokeStyle="darkblue";
+        ctx.strokeRect(ship.pos[0],ship.pos[1],ship.width,ship.height );
+        }
+        else{
+            ctx.strokeStyle="green";
+            ctx.strokeRect(ship.cell[0]*25+myFieldXOffset,ship.cell[1]*25+250.5,ship.width,ship.height );
+        }
+    }
+
+
+
+
 
 
     //Draw the enemy field
+    ctx.strokeStyle="darkblue";
     ctx.fillText(" 1  2  3  4  5  6  7  8  9 10", enemyFieldXOffset,246.5);
     ctx.fillText(" A", enemyFieldXOffset-28,246.5+25*1);
     ctx.fillText(" B", enemyFieldXOffset-28,246.5+25*2); 
