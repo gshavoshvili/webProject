@@ -12,17 +12,22 @@
     </style>
 </head>
 <body>
-<canvas id="Canvas" width="700" height="600" style="border: 1px solid black"></canvas>
+<?php echo $_GET['match'];?>
+<!-- Tabindex to make it focusable -->
+<canvas tabindex="1" id="Canvas" width="700" height="600" style="border: 1px solid black"></canvas>
 <script>
 //Game variables
 var canvas = document.getElementById("Canvas");
 var ctx = canvas.getContext("2d");
+var mousePosition = {x:0,y:0};
 var myFieldXOffset = 50.5;
 var enemyFieldXOffset = 400.5;
 var cellWidth = 25;
 var dotRadius = 3.5;
 var crossHalfWidth = 9;
+var state = 0;
 var myTurn = false;
+
 
 //Drag&Drop
 var dragging = null;
@@ -84,6 +89,8 @@ function mouseDownHandler(e){
 }
 canvas.addEventListener('mousemove',mouseMoveHandler, false);
 function mouseMoveHandler(e){
+    mousePosition.x = e.offsetX;
+    mousePosition.y = e.offsetY;
     if (dragging!=null){
         if(dragging.cell!=null){
             myField[dragging.cell[0]][dragging.cell[1]] = 0;
@@ -119,6 +126,10 @@ function mouseUpHandler(e){
     if(dragging!=null ){
         if (dragging.cell==null){
             dragging.pos=dragging.initPos;
+            if(dragging.rot==1){
+                rotateShip(dragging);
+            }
+            
         }
         else{
             dragging.pos=[dragging.cell[0]*25+myFieldXOffset,dragging.cell[1]*25+250.5]
@@ -176,6 +187,27 @@ function mouseUpHandler(e){
         dragging=null;
     }
 }
+
+var alreadyRotated = false;
+canvas.addEventListener('keydown',keyDownHandler, false);
+function keyDownHandler(e){
+    if(e.code == 'KeyR'){
+        if(!alreadyRotated && dragging!=null){
+            rotateShip(dragging);
+            mouseMoveHandler({offsetX:mousePosition.x, offsetY:mousePosition.y});
+            alreadyRotated=true;
+        }
+    }
+    
+}
+canvas.addEventListener('keyup',keyUpHandler, false);
+function keyUpHandler(e){
+    if(e.code == 'KeyR'){
+        alreadyRotated=false;
+    }
+    
+}
+
 //WebSocket connection
 var conn = new WebSocket('ws://localhost:8080');
 conn.onopen = function(e) {
@@ -293,6 +325,27 @@ function clickHandler(e){
     clicked.push(click);
     myTurn=false;
     }
+}
+
+
+function rotateShip(ship){
+
+    var temp = ship.width;
+    ship.width = ship.height;
+    ship.height= temp;
+    if(ship.rot == 0){
+        ship.rot = 1;
+        temp = dragOffset[1];
+        dragOffset[1] = dragOffset[0];
+        dragOffset[0] = 25-temp;
+    }
+    else{
+        ship.rot = 0;
+        temp = dragOffset[1];
+        dragOffset[1] = 25-dragOffset[0];
+        dragOffset[0] = temp;
+    }
+            
 }
 
 function drawBG(){
