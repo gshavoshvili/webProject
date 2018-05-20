@@ -18,23 +18,12 @@
 	for ($i = 0; $i < 8; ++$i) {
 		$pieces []= $keyspace[random_int(0, $max)];
 	}
-	if (!isset($_SESSION['link1'])) {
-	$_SESSION['link1'] = implode('', $pieces);}
-	elseif (!isset($_SESSION['link2'])) {
-		$_SESSION['link2'] = implode('', $pieces);}
-	elseif (!isset($_SESSION['link3'])) {
-		$_SESSION['link3'] = implode('', $pieces);}
-	elseif (!isset($_SESSION['link4'])) {
-		$_SESSION['link4'] = implode('', $pieces);}
-	elseif (!isset($_SESSION['link5'])) {
-		$_SESSION['link5'] = implode('', $pieces);}		
-	else echo "You can't create more games";
+	if (!isset($_SESSION['link'])) {
+	$_SESSION['link'] = implode('', $pieces);}
+	$specialPath = getenv('BASE_PATH'); echo($specialPath);
 	exit();
  }
 
- /*if (isset($_SESSION['link'])){
-	 echo $_SESSION['link'];
- }*/
 ?>
 <!DOCTYPE html>
 <html>
