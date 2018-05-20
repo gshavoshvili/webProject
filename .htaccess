@@ -1,11 +1,6 @@
 RewriteEngine On
-<<<<<<< HEAD
-SetEnvIf Request_URI "^.*" base_path "?match="
-RewriteRule ^game?match=.x game.php
-=======
 
 RewriteRule ^game/([a-z0-9]+)/?$ game.php?match=$1    [NC,L]
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME}\.php -f
 RewriteRule ^(.+)$ $1.php [L]
->>>>>>> d529e25898ba3da5836a420ad0963ec7cd212f58
