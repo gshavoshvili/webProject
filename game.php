@@ -12,6 +12,7 @@
     </style>
 </head>
 <body>
+<?php echo $_GET['match'];?>
 <!-- Tabindex to make it focusable -->
 <canvas tabindex="1" id="Canvas" width="700" height="600" style="border: 1px solid black"></canvas>
 <script>
