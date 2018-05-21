@@ -1,6 +1,7 @@
 RewriteEngine On
 
-RewriteRule ^game/([a-z0-9]+)/?$ game.php?match=$1    [NC,L]
+
+RewriteRule ^game/([a-z0-9]+)/?$ game.php?match=$1    [NC,END]
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME}\.php -f
-RewriteRule ^(.+)$ $1.php [L]
+RewriteRule ^(.+)$ $1.php [END]

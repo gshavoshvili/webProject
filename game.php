@@ -1,3 +1,8 @@
+<?php 
+if(!isset($_GET['match'])){
+    header("Location: index.php");
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
