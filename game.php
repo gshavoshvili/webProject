@@ -9,13 +9,14 @@
     $match_link_check_query = "SELECT match_link FROM matches WHERE match_link='$match_link' LIMIT 1";
     $match_result = mysqli_query($db, $match_link_check_query);
     $match_link_array = mysqli_fetch_assoc($match_result);
-
+    
+    // checks if $_GET link exists in DB
     if (isset($match_link_array['match_link'])) {
-
+    // Desides who is connected user, creator of the game or his opponent    
         $username_check_query = "SELECT username from users, matches WHERE users.username='$username' AND users.id = matches.id AND matches.match_link = '$match_link' LIMIT 1 ";
         $username_result = mysqli_query($db,$username_check_query);
         $username_array = mysqli_fetch_assoc($username_result);
-        if (isset($username_array['username'])) {
+        if (isset($username_array['username'])) { 
             
         }
         else {
@@ -52,9 +53,13 @@
     </style>
 </head>
 <body>
-
+    
 <!-- Tabindex to make it focusable -->
 <canvas tabindex="1" id="Canvas" width="700" height="600" style="border: 1px solid black"></canvas>
-<script src="../game.js"></script>
+
+<script src="../game.js">
+var username='<?php echo $username ?>';
+var match = '<?php echo $match_link ?>';
+</script>
 </body>
 </html>
