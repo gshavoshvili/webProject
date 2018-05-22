@@ -10,8 +10,7 @@
   	header("location: login.php");
   }
   //generator
- if (isset($_GET['action'])) {
-    
+ function generator () {
 	$keyspace = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 	$pieces = [];
 	$max = mb_strlen($keyspace, '8bit') - 1;
@@ -20,7 +19,32 @@
 	}
 
 	$_SESSION['link'] = implode('', $pieces);
-	echo $_SESSION['link'];
+ }
+ if (isset($_GET['action'])) {
+	$db = mysqli_connect('localhost', 'root', '', 'registration');
+
+	//
+	do{	
+		generator();
+		$sess_link = $_SESSION['link'];
+		$match_link_check_query = "SELECT match_link FROM matches WHERE match_link='$sess_link' LIMIT 1";
+		$result = mysqli_query($db, $match_link_check_query);
+		$match_link = mysqli_fetch_assoc($result);
+	}
+	while($match_link['match_link'] === $sess_link);
+	//
+	
+	//checks number of links created by user; if > 5 stops
+	$sess_username=$_SESSION['username'];
+	$count_links="SELECT COUNT(*) as num FROM matches WHERE user_id =(SELECT ID FROM users WHERE username ='$sess_username')";
+	$result = mysqli_query($db, $count_links);
+	$counter = mysqli_fetch_assoc($result);
+	if ($counter['num'] >=5 ) { echo "You can not have more that 5 active games"; }
+	else{  
+	$query="INSERT INTO matches (match_link,user_id) Values ('$sess_link',(SELECT ID FROM users WHERE username ='$sess_username'))";
+	mysqli_query($db,$query);}
+	
+	//echo $_SESSION['link'];
 	
 	
 	exit();
@@ -69,7 +93,8 @@
 		url: "index.php",
 		data: { action: "abc" }
 		}).done(function(msg) {
-		window.location.href = "game/"+msg;
+			alert(msg);
+		//window.location.href = "game/"+msg;
 		});
   	 });
 
