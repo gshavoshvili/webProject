@@ -36,15 +36,16 @@
 	
 	//checks number of links created by user; if > 5 stops
 	$sess_username=$_SESSION['username'];
-	$count_links="SELECT COUNT(*) as num FROM matches WHERE user_id =(SELECT ID FROM users WHERE username ='$sess_username')";
+	$count_links="SELECT COUNT(*) as num FROM matches WHERE creator_id =(SELECT ID FROM users WHERE username ='$sess_username')";
 	$result = mysqli_query($db, $count_links);
 	$counter = mysqli_fetch_assoc($result);
 	if ($counter['num'] >=5 ) { echo "You can not have more that 5 active games"; }
 	else{  
-	$query="INSERT INTO matches (match_link,user_id) Values ('$sess_link',(SELECT ID FROM users WHERE username ='$sess_username'))";
+	$query="INSERT INTO matches (match_link,creator_id) Values ('$sess_link',(SELECT ID FROM users WHERE username ='$sess_username'))";
 	mysqli_query($db,$query);}
 	
-	//echo $_SESSION['link'];
+	echo $_SESSION['link'];
+	
 	
 	
 	exit();
@@ -94,7 +95,7 @@
 		data: { action: "abc" }
 		}).done(function(msg) {
 			alert(msg);
-		//window.location.href = "game/"+msg;
+		window.location.href = "game/"+msg;
 		});
   	 });
 
