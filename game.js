@@ -26,7 +26,7 @@ var ships;
 
 
 
-
+console.log(username);
 
 var myField;
 var enemyField;

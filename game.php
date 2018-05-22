@@ -56,10 +56,10 @@
     
 <!-- Tabindex to make it focusable -->
 <canvas tabindex="1" id="Canvas" width="700" height="600" style="border: 1px solid black"></canvas>
-
-<script src="../game.js">
+<script>
 var username='<?php echo $username ?>';
 var match = '<?php echo $match_link ?>';
 </script>
+<script src="../game.js"></script>
 </body>
 </html>
