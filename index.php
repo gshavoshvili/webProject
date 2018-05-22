@@ -94,8 +94,10 @@
 		url: "index.php",
 		data: { action: "abc" }
 		}).done(function(msg) {
-			alert(msg);
-		window.location.href = "game/"+msg;
+		if (msg=="You can not have more that 5 active games") {
+			alert(msg);}
+		else {
+		window.location.href = "game/"+msg;}
 		});
   	 });
 
