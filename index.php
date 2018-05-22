@@ -42,9 +42,9 @@
 	if ($counter['num'] >=5 ) { echo "You can not have more that 5 active games"; }
 	else{  
 	$query="INSERT INTO matches (match_link,creator_id) Values ('$sess_link',(SELECT ID FROM users WHERE username ='$sess_username'))";
-	mysqli_query($db,$query);}
+	mysqli_query($db,$query);
 	
-	echo $_SESSION['link'];
+	echo $_SESSION['link'];}
 	
 	
 	
