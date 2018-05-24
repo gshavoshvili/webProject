@@ -4,20 +4,20 @@ use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
 
 class Chat implements MessageComponentInterface {
-    protected $clients;
+    protected $connections;
 
     public function __construct() {
         
-        $this->clients = array();
+        $this->connections = array();
     }
 
     public function onOpen(ConnectionInterface $conn) {
         // Store the new connection to send messages to later
-        $this->clients[]=$conn;
+        $this->connections[]=$conn;
         echo "New connection! ({$conn->resourceId})\n";
-        if (count($this->clients)==2){
+        if (count($this->connections)==2){
             $first = rand(0,1);
-            $this->clients[$first]->send("START");
+            $this->connections[$first]->send("START");
             echo "Game started: player $first is first";
         }
 
@@ -25,11 +25,11 @@ class Chat implements MessageComponentInterface {
     }
 
     public function onMessage(ConnectionInterface $from, $msg) {
-        $numRecv = count($this->clients) - 1;
+        $numRecv = count($this->connections) - 1;
         echo sprintf('Connection %d sending message "%s" to %d other connection%s' . "\n"
             , $from->resourceId, $msg, $numRecv, $numRecv == 1 ? '' : 's');
 
-        foreach ($this->clients as $client) {
+        foreach ($this->connections as $client) {
             if ($from !== $client) {
                 // The sender is not the receiver, send to each client connected
                 $client->send($msg);
@@ -39,7 +39,7 @@ class Chat implements MessageComponentInterface {
 
     public function onClose(ConnectionInterface $conn) {
         // The connection is closed, remove it, as we can no longer send it messages
-        $this->clients->detach($conn);
+        $this->connections->detach($conn);
 
         echo "Connection {$conn->resourceId} has disconnected\n";
     }
