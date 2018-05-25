@@ -11,13 +11,13 @@ public $player2status = false;
     public function setFirstPlayer($conn){
         
         $this->$player1=$conn;
-
+        echo 'player1';
     }
 
     public function setSecondPlayer($conn){
         
         $this->$player2=$conn;
-
+        echo 'player2';
     }
 
     public function FirstPlayerField(){

@@ -23,7 +23,6 @@ var States = {
     "PLAYING":3
 };
 
-
 var state = States.CONNECTED;
 console.log(state);
 
@@ -317,11 +316,13 @@ function keyUpHandler(e){
 
 //WebSocket connection
 var conn = new WebSocket('ws://localhost:8080');
+var info = {
+    username:username,
+    match: match
+ }
+ console.log(JSON.stringify(info));
 conn.onopen = function(e) {
-    var info = {
-        username:username,
-        match: match
-     }
+    
      conn.send(JSON.stringify(info));
 };
 
