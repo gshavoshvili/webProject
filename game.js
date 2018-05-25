@@ -13,7 +13,20 @@ var enemyFieldXOffset = 400.5;
 var cellWidth = 25;
 var dotRadius = 3.5;
 var crossHalfWidth = 9;
-var state = 0;
+
+
+
+var States = {
+    "CONNECTED" : 0,
+    "SETUP" : 1,
+    "SETUP_WAITING":2,
+    "PLAYING":3
+};
+
+
+var state = States.CONNECTED;
+console.log(state);
+
 var myTurn = false;
 
 var coordinatesImg = new Image();
@@ -90,39 +103,33 @@ function setMyField(){
         };
     };
     
-    ships=[{
-        initPos:  [200.5,100.5],
-        pos: [200.5,100.5],
-        width: cellWidth,
-        height:cellWidth*4,
-        cell:null, // RENAME
-        cells: [],
-        around: [],
-        rot:1,
-        placed: false
-        },
-        {
-        initPos:  [250.5,100.5],
-        pos: [250.5,100.5],
-        width: cellWidth*3,
-        height:cellWidth,
-        cell:null, // RENAME
-        cells: [],
-        around: [],
-        rot:0,
-        placed: false
-        },
-        {
-        initPos:  [250.5,175.5],
-        pos: [250.5,175.5],
-        width: cellWidth*3,
-        height:cellWidth,
-        cell:null, // RENAME
-        cells: [],
-        around: [],
-        rot:0,
-        placed: false
-        }]
+    function Ship(x,y,cells){
+        this.initPos = [x,y];
+        this.pos = [x,y];
+        this.width = cellWidth * cells;
+        this.height = cellWidth;
+        this.cells = [];
+        this.around = [];
+        this.rot = 0;
+        this.placed = false;
+    }
+
+
+
+    ships = [
+        new Ship(400.5, 275.5, 4),
+        new Ship(400.5,325.5,3),
+        new Ship(500.5,325.5,3),
+        new Ship(400.5,375.5,2),
+        new Ship(475.5,375.5,2),
+        new Ship(550.5,375.5,2),
+        new Ship(400.5,425.5,1),
+        new Ship(450.5,425.5,1),
+        new Ship(500.5,425.5,1),
+        new Ship(550.5,425.5,1),
+    ];
+
+    
 
 
 
@@ -311,8 +318,11 @@ function keyUpHandler(e){
 //WebSocket connection
 var conn = new WebSocket('ws://localhost:8080');
 conn.onopen = function(e) {
-    console.log("Connection established!");
-    var i = 1;
+    var info = {
+        username:username,
+        match: match
+     }
+     conn.send(JSON.stringify(info));
 };
 
 conn.onmessage = function(e) {
@@ -579,7 +589,11 @@ function draw(){
 
     drawBG();
     drawMyField();
-    drawEnemyField();
+
+    if(state == States.PLAYING){
+        drawEnemyField();
+    }
+    
 
 
     
