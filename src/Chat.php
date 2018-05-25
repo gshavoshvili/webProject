@@ -6,9 +6,11 @@ use Ratchet\ConnectionInterface;
 
 class Chat implements MessageComponentInterface {
     protected $connections;
-
+    protected $matches;
     public function __construct() {
         $this->connections = array();
+        $this->matches = array();
+        $this->ds = mysqli_connect('localhost', 'root', '', 'registration');
     }
 
     public function onOpen(ConnectionInterface $conn) {
@@ -26,25 +28,46 @@ class Chat implements MessageComponentInterface {
     }
 
     public function onMessage(ConnectionInterface $from, $jsmessage) {
-        $db = mysqli_connect('localhost', 'root', '', 'registration');
+        $db = $this->ds;
         $json = json_decode($jsmessage);
         $unsafe_username = $json->username;
         $unsafe_match_link = $json->match;
         $username = mysqli_real_escape_string($db,$unsafe_username);
         $match_link = mysqli_real_escape_string($db,$unsafe_username);
-        $match = new Match;
+        
 
         if(isset($username) && isset($match_link)){
             
-            $match_link_check_query = "SELECT match_link from matches where match_link = '$match_link' AND (creator_id = (select id from users where username = '$username') OR opponent_id = (select id from users where username = '$username')) LIMIT 1";
-            $result = mysqli_query($db, $match_link_check_query);
-            $match_link = mysqli_fetch_assoc($result);
-            if(isset($match_link)){
+            $match_link_creator_query = "SELECT match_link from matches where match_link = '$match_link' AND (creator_id = (select id from users where username = '$username') ) LIMIT 1";
+            $result = mysqli_query($db, $match_link_creator_query);
+            $match_link1 = mysqli_fetch_assoc($result);
+            
+            $match_link_opponent_query = "SELECT match_link from matches where match_link = '$match_link' AND opponent_id = (select id from users where username = '$username')) Limit 1 ";
+            $result = mysqli_query($db, $match_link_creator_query);
+            $match_link2 = mysqli_fetch_assoc($result);
+
+            if(isset($match_link1)){
                 
-                $match->FirstPlayerReady();
+                if(isset($this->matches[$match_link1])){
+                    $this->matches[$match_link1] -> setSecondPlayer($from);
+                }
+                else{
+                    $this->matches[$match_link1] = new Match;
+                    $this->matches[$match_link1] -> setFirstPlayer($from);
+                }
+            }
+
+            elseif(isset($match_link2)){
+
+                
 
             }
+
+
             
+            elseif(){
+            
+            }
         }
         
         

@@ -5,25 +5,26 @@ public $player1;
 public $player2;
 public $array1 = array();
 public $array2 = array();
-public $status;
+public $player1status = false;
+public $player2status = false;
 
-    public function FirstPlayer($username){
+    public function setFirstPlayer($conn){
         
-        $this->$player1=$username;
+        $this->$player1=$conn;
 
     }
 
-    public function SecondPlayer($username){
+    public function setSecondPlayer($conn){
         
-        $this->$player2=$username;
+        $this->$player2=$conn;
 
     }
 
-    public function FirstPlayerFuild(){
+    public function FirstPlayerField(){
 
     }
 
-    public function SecondPlayerFuild(){
+    public function SecondPlayerField(){
 
     }
     
@@ -32,11 +33,11 @@ public $status;
     }
 
     public function Connection1(){
-
+        $this->$player1status=true;
     }
     
     public function Connection2 (){
-
+        $this->$player1status=true;
     }
 
 }
