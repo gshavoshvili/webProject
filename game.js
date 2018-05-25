@@ -331,8 +331,7 @@ conn.onmessage = function(e) {
         myTurn=true;
     }
     else {
-        clicked.push(JSON.parse(e.data));
-        myTurn=true;
+        console.log(e.data);
     }
     
 };
