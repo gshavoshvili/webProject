@@ -7,6 +7,7 @@ use Ratchet\ConnectionInterface;
 class Chat implements MessageComponentInterface {
     protected $connections;
     protected $matches;
+
     public function __construct() {
         $this->connections = array();
         $this->matches = array();
@@ -18,14 +19,7 @@ class Chat implements MessageComponentInterface {
         echo "New connection! ({$conn->resourceId})\n";
         $this->connections[$conn->resourceId]=null;
         $conn->send("i'm here");
-       /* 
-            if (count($this->connections)==2){
-            $first = rand(0,1);
-            $this->connections[$first]->send("START");
-            echo "Game started: player $first is first";
-        }
-       */
-        
+
     }
 
     public function onMessage(ConnectionInterface $from, $msg) {
