@@ -7,6 +7,7 @@ use Ratchet\ConnectionInterface;
 class Chat implements MessageComponentInterface {
     protected $connections;
     protected $matches;
+
     public function __construct() {
         $this->connections = array();
         $this->matches = array();
@@ -18,18 +19,10 @@ class Chat implements MessageComponentInterface {
         echo "New connection! ({$conn->resourceId})\n";
         $this->connections[]=$conn;
         $conn->send("i'm here");
-       /* 
-            if (count($this->connections)==2){
-            $first = rand(0,1);
-            $this->connections[$first]->send("START");
-            echo "Game started: player $first is first";
-        }
-       */
-        
+
     }
 
     public function onMessage(ConnectionInterface $from, $msg) {
-        echo '2323';
         $db = $this->ds;
         $json = json_decode($msg);
         $unsafe_username = $json->username;
@@ -39,12 +32,12 @@ class Chat implements MessageComponentInterface {
         
 
         if(isset($username) && isset($match_link)){
-            echo $match_link;
+            echo $match_link."\n";
             echo $username;
             $match_query = "SELECT c.username as creator, o.username as opponent from matches m left outer join users c on m.creator_id = c.id left outer join users o on m.opponent_id = o.id where m.match_link = '$match_link'";
             $match_query_result = mysqli_query($db, $match_query);
             $match_array = mysqli_fetch_assoc($match_query_result);
-            echo 'dddd';
+            
             print_r($match_array);
             if(isset($match_array)){
                 echo 'match found';
@@ -65,7 +58,7 @@ class Chat implements MessageComponentInterface {
                 else{
                     $from->close();
                 }
-                echo 232323232;
+               
 
 
             }
@@ -74,13 +67,9 @@ class Chat implements MessageComponentInterface {
             }
 
 
-            
-
-
-            
-           
         }
         
+
         else {
             $from->close();
         }
