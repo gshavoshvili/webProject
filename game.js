@@ -23,7 +23,7 @@ var States = {
     "PLAYING":3
 };
 
-var state = States.CONNECTED;
+var state = States.SETUP;
 console.log(state);
 
 var myTurn = false;
@@ -311,7 +311,20 @@ function keyUpHandler(e){
     else if (e.code == 'KeyF'){
         randomize();
     }
+    else if (state == States.SETUP && e.code == 'KeyS'){
+        if(ships.every((e)=>e.placed)){
+            sendField();
+        }
+        
+    }
     
+}
+
+function sendField(){
+
+    var data = ships.map((e)=>[e.cells[0][0],e.cells[0][1],e.rot])
+    console.log(data);
+    conn.send(JSON.stringify(data));
 }
 
 //WebSocket connection

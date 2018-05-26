@@ -1,12 +1,29 @@
 <?php
 namespace MyApp;
+
+abstract class States
+{
+    const CONNECTING = 0;
+    const SETUP = 1;
+    const PLAYING = 2;
+    const OVER = 3;
+}
+
+
+
 class Match{
+public $state;
 public $player1;
 public $player2;
 public $array1 = array();
 public $array2 = array();
 public $player1status = false;
 public $player2status = false;
+
+
+    function __construct(){
+        $this->state = States::SETUP;
+    }
 
     public function setFirstPlayer($conn){
         
