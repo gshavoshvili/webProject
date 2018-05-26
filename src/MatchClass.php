@@ -7,7 +7,13 @@ class Match
     
     public $ship4 = array(array(0, 0, 'allive'), array(0, 1, 'allive'), array(0, 2, 'allive'), array(0, 3, 'allive'));
     
-    
+    $ship4 = array(     
+        array(0,0,'allive'),
+        array(0,1,'allive'),
+        array(0,2,'allive'),
+        array(0,3,'allive')
+    );
+
     /*public $array1 = array(
     array($ship4,$ship4,$ship4,$ship4,0,0,0,0,0,0),
     array(0,0,0,0,0,0,0,0,0,0),
@@ -39,14 +45,14 @@ class Match
     {
         
         $ship = $array1[$x][$y]; //ship по которому прошло попадание
-        if ($ship == 0 || $ship == -1) {
+        if ($ship == 0 || $ship == -1 || $ship == 1) {
             $ship[$x][$y] = -1;
         } else {
             $counter = 0;
             foreach ($ship as $kek) {
                 
                 if ($kek[0] == $x && $kek[1] == $y && $kek[2] == 'allive') {
-                    $kek[2]       = 'dead';
+                    $kek[2] = 'dead';
                     $ship[$x][$y] = 1;
                 }
                 
@@ -63,8 +69,10 @@ class Match
                 //this ship is dead, send to JS
                 
             }
-            
+            WinCheck();
         }
+        
+
     }
     //if yes then check соответствующий array
     //substitute arraypole[x][y] with 1;
@@ -95,6 +103,20 @@ class Match
         $this->$player1status = true; //KTTC
     }
     
+    public function WinCheck()
+    {   $counter =0;
+
+        foreach($ship as $kek){
+            for($i = 0;$i<10;i++){
+                if ($kek[i] == 0 || $kek[i] == 1 || $kek[i] == -1){
+                    $counter++;
+                }
+            }
+        }
+        if ($counter == 0){
+            //match is won
+        }
+    }
     public function GameStatus()
     {
         
