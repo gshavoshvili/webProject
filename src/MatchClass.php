@@ -148,7 +148,7 @@ public $player2status = false; // TO BE CHANGED
             $player1->send("USTART");
             $player2->send("START");
         }
-        if($turn==0){
+        if($turn==1){
             $player2->send("USTART");
             $player1->send("START");
         }     
