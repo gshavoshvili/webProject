@@ -536,6 +536,8 @@ public $player2status = false; // TO BE CHANGED
             }
             if ($counter == 0){
                 $this->player1->send("UWIN");
+                $this->player2->send("ULOSE");
+                $this->state = States::OVER;
             }
         }
         if($this->turn==1){
@@ -552,13 +554,16 @@ public $player2status = false; // TO BE CHANGED
                 }
             }
             if ($counter == 0){
-                $this->player2->send("ULOSE");
+                
+                $this->player2->send("UWIN");
+                $this->player1->send("ULOSE");
+                $this->state = States::OVER;
             }
         }
     }
     public function GameStatus()
     {
-        $this->state = States::OVER;
+        
     }
     
 }
