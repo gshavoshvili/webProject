@@ -346,20 +346,46 @@ conn.onmessage = function(e) {
     if(e.data=='START'){
         state=States.PLAYING;
         myTurn = false;
+        console.log('enemy starts');
     }
     else if(e.data=='USTART'){
         state=States.PLAYING;
         myTurn=true;
-
+        console.log('I start');
     }
     else if (e.data == 'GOOD'){
         state=States.SETUP_WAITING;
     }
     else if (e.data == 'SETUP'){
         state=States.SETUP;
+        console.log('setup');
     }
     else if (e.data == 'CONNECTED'){
         state=States.CONNECTED_WAITING;
+        console.log('connected');
+    }
+    // UWIN ULOSE
+    else if (state = States.PLAYING){
+        var arr = JSON.parse(e.data);
+        console.log(arr);
+        arr.forEach( function(order) {
+            if(order == 'URTURN'){
+                myTurn = true;
+                console.log('my turn');
+            }
+            else if (order == 'ENDTURN'){
+                myTurn = false;
+                console.log('turn over');
+            }
+            else {
+                if(myTurn){
+                    enemyField[order[0]][order[1]] = order[2];
+                }
+                else {
+                    myField[order[0]][order[1]] = order[2];
+                }
+            }
+        } );
     }
     else {
         console.log(e.data);
@@ -394,9 +420,8 @@ function clickHandler(e){
         var y = e.offsetY-250.5;
         var gridX = Math.floor(x/cellWidth);
         var gridY = Math.floor(y/cellWidth);
-        var click = [e.offsetX,e.offsetY];
+        var click = [gridX,gridY];
         conn.send(JSON.stringify(click));
-        myTurn=false;
     }
     
 }
@@ -514,22 +539,22 @@ function drawMyField(){
         }
     }
 
-
-    ctx.strokeStyle="darkblue"
-    ctx.lineWidth=3;
-    
-    for(var i = 0; i<ships.length;i++){
-        var ship = ships[i]; 
-        if(ship.cells.length==0){
-            ctx.strokeStyle="darkblue";
-            ctx.strokeRect(ship.pos[0],ship.pos[1],ship.width,ship.height );
-        }
-        else if (!ship.placed) {
-            ctx.strokeStyle="green";
-            ctx.strokeRect(ship.cells[0][0]*25+myFieldXOffset,ship.cells[0][1]*25+250.5,ship.width,ship.height );
+    if(state == States.SETUP){
+        ctx.strokeStyle="darkblue"
+        ctx.lineWidth=3;
+        
+        for(var i = 0; i<ships.length;i++){
+            var ship = ships[i]; 
+            if(ship.cells.length==0){
+                ctx.strokeStyle="darkblue";
+                ctx.strokeRect(ship.pos[0],ship.pos[1],ship.width,ship.height );
+            }
+            else if (!ship.placed) {
+                ctx.strokeStyle="green";
+                ctx.strokeRect(ship.cells[0][0]*25+myFieldXOffset,ship.cells[0][1]*25+250.5,ship.width,ship.height );
+            }
         }
     }
-
 
 }
 
@@ -611,11 +636,7 @@ function draw(){
 
     drawBG();
     
-    if(true||state==States.CONNECTED_WAITING || state==States.SETUP_WAITING){
-        ctx.font = "32px Arial";
-        ctx.fillStyle="darkblue";
-        ctx.fillText("Waiting for the opponent...",178,300);
-    }
+    
 
     if(state != States.CONNECTING){
         drawMyField();
@@ -625,7 +646,11 @@ function draw(){
     if(state == States.PLAYING){
         drawEnemyField();
     }
-    
+    if(state==States.CONNECTED_WAITING || state==States.SETUP_WAITING){
+        ctx.font = "32px Arial";
+        ctx.fillStyle="darkblue";
+        ctx.fillText("Waiting for the opponent...",178,150);
+    }
 
 
     

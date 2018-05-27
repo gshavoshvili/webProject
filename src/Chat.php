@@ -18,7 +18,6 @@ class Chat implements MessageComponentInterface {
         // Store the new connection to send messages to later
         echo "New connection! ({$conn->resourceId})\n";
         $this->connections[$conn->resourceId]=null;
-        $conn->send("i'm here");
 
     }
 
@@ -42,7 +41,6 @@ class Chat implements MessageComponentInterface {
                 $match_query = "SELECT c.username as creator, o.username as opponent from matches m left outer join users c on m.creator_id = c.id left outer join users o on m.opponent_id = o.id where m.match_link = '$match_link' LIMIT 1";
                 $match_query_result = mysqli_query($db, $match_query);
                 $match_array = mysqli_fetch_assoc($match_query_result);
-                echo 'dddd';
                 print_r($match_array);
                 if(isset($match_array)){
                     echo 'match found';
@@ -69,7 +67,7 @@ class Chat implements MessageComponentInterface {
                     else{
                         $from->close();
                     }
-                    echo 232323232;
+                    
 
 
                 }
@@ -109,7 +107,10 @@ class Chat implements MessageComponentInterface {
 
 
 
-
+            elseif($match->state==States::PLAYING){
+                echo "He sent a shot\n";
+                $match->Shot($json,$from);
+            }
 
             else {
                 $from->close();
