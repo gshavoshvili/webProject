@@ -15,10 +15,12 @@ class Match{
 public $state;
 public $player1;
 public $player2;
+public $ships1;
+public $ships2;
 public $ship4 = array(array(0, 0, 'allive'), array(0, 1, 'allive'), array(0, 2, 'allive'), array(0, 3, 'allive'));
     
     
-/*public $array1 = array(
+/*public $this->array1 = array(
 array($ship4,$ship4,$ship4,$ship4,0,0,0,0,0,0),
 array(0,0,0,0,0,0,0,0,0,0),
 array(0,0,0,0,0,0,0,0,0,0),
@@ -54,7 +56,7 @@ public $player2status = false;
     public function Shot($x, $y)
     {
         
-        $ship = $array1[$x][$y]; //ship по которому прошло попадание
+        $ship = $this->array1[$x][$y]; //ship по которому прошло попадание
         if ($ship == 0 || $ship == -1 || $ship == 1) {
             $ship[$x][$y] = -1;
         } else {
@@ -96,11 +98,258 @@ public $player2status = false;
     3 - enemy sunk
     */
     
-    
-    
-    public function SecondPlayerField()
-    {
+    public function FirstPlayerField($json)
+    {   if(count($json)==10){
+
+            $this->array1 = array(
+                array(0,0,0,0,0,0,0,0,0,0),
+                array(0,0,0,0,0,0,0,0,0,0),
+                array(0,0,0,0,0,0,0,0,0,0),
+                array(0,0,0,0,0,0,0,0,0,0),
+                array(0,0,0,0,0,0,0,0,0,0),
+                array(0,0,0,0,0,0,0,0,0,0),
+                array(0,0,0,0,0,0,0,0,0,0),
+                array(0,0,0,0,0,0,0,0,0,0),
+                array(0,0,0,0,0,0,0,0,0,0),
+                array(0,0,0,0,0,0,0,0,0,0)
+                );
+
+            $this->ships1 = array();
+                
+            $shipLengths = array(
+                0=>4,
+                1=>3,
+                2=>3,
+                3=>2,
+                4=>2,
+                5=>2,
+                6=>1,
+                7=>1,
+                8=>1,
+                9=>1
+            );
+            for ($n = 0; $n<10; $n++){
+                $ship = $json[$n];
+                $shipArr = array();
+                $x = (int) $ship[0];
+                $y = (int) $ship[1];        
+                $rot = (int) $ship[2];
+                $length = $shipLengths[$n];
+
+                $canPlace = true;
+                
+                for ($i = 0; $i<$length;$i++){
+                    if($this->array1[$x+(($rot==0)?$i:0)][$y+(($rot==1)?$i:0)]==0){
+                        $this->array1[$x+(($rot==0)?$i:0)][$y+(($rot==1)?$i:0)]=$shipArr;
+                        $shipArr[] = array($x,$y,'alive');
+                    }
+                    else{
+                        $canPlace = false;
+                        break;
+                    }
+                }
+                if(!$canPlace){
+                    $player1->close();
+                }
+                else{
+                    $this->ships1[]=$shipArr;
+                    if($rot==0){
+                        for ($i = ($x>0?-1:0); $i<= $length -(($x+$length<10)?0:1) ;$i++){
+                           if($y>0){
+                             
+                                $this->array1[$x+$i][$y-1]=-1;
+                           }
+                           if($y<9) {
+                               
+                               $this->array1[$x+$i][$y+1]=-1;
+                           }
+                        }
+                    if($x>0){
+                        
+                        $this->array1[$x-1][$y]=-1;
+                    } 
+                    if($x+$length<10){
+                        
+                        $this->array1[$x+$length][$y]=-1;
+                    } 
         
+                    } 
+        
+                    else{
+                        for ($i = (($y)>0?-1:0); $i<= $length -(($y+$length<10)?0:1) ;$i++){
+                           if($x>0){
+                                
+                                $this->array1[$x-1][$y+$i]=-1;
+                           } 
+                           if($x<9){
+                                
+                                $this->array1[$x+1][$y+$i]=-1;
+                           } 
+                        }
+                    if($y>0){
+                        $this->array1[$x][$y-1]=-1;
+                    } 
+                    if($y+$length<10) {
+                        
+                        $this->array1[$x][$y+$length]=-1;
+                    }
+                    }
+                }
+
+
+
+
+
+            }
+
+            for($i = 0; $i<10; $i++){
+                for($j = 0; $j<10; $j++){
+                    if($this->array1[$i][$j] == -1){
+                        $this->array1[$i][$j]=0;
+                    }
+                }
+            }
+
+
+            print_r($this->array1);
+            print_r($this->ships1);
+
+
+
+
+        }
+
+
+
+        else{
+            $player1->close();
+        }
+
+    }
+    
+    public function SecondPlayerField($json)
+    {   if(count($json)==10){
+
+            $this->array2 = array(
+                array(0,0,0,0,0,0,0,0,0,0),
+                array(0,0,0,0,0,0,0,0,0,0),
+                array(0,0,0,0,0,0,0,0,0,0),
+                array(0,0,0,0,0,0,0,0,0,0),
+                array(0,0,0,0,0,0,0,0,0,0),
+                array(0,0,0,0,0,0,0,0,0,0),
+                array(0,0,0,0,0,0,0,0,0,0),
+                array(0,0,0,0,0,0,0,0,0,0),
+                array(0,0,0,0,0,0,0,0,0,0),
+                array(0,0,0,0,0,0,0,0,0,0)
+                );
+
+            $this->ships2 = array();
+                
+            $shipLengths = array(
+                0=>4,
+                1=>3,
+                2=>3,
+                3=>2,
+                4=>2,
+                5=>2,
+                6=>1,
+                7=>1,
+                8=>1,
+                9=>1
+            );
+            for ($n = 0; $n<10; $n++){
+                $ship = $json[$n];
+                $shipArr = array();
+                $x = (int) $ship[0];
+                $y = (int) $ship[1];        
+                $rot = (int) $ship[2];
+                $length = $shipLengths[$n];
+
+                $canPlace = true;
+                
+                for ($i = 0; $i<$length;$i++){
+                    if($this->array2[$x+(($rot==0)?$i:0)][$y+(($rot==1)?$i:0)]==0){
+                        $this->array2[$x+(($rot==0)?$i:0)][$y+(($rot==1)?$i:0)]=$shipArr;
+                        $shipArr[] = array($x,$y,'alive');
+                    }
+                    else{
+                        $canPlace = false;
+                        break;
+                    }
+                }
+                if(!$canPlace){
+                    $player2->close();
+                }
+                else{
+                    $this->ships2[]=$shipArr;
+                    if($rot==0){
+                        for ($i = ($x>0?-1:0); $i<= $length -(($x+$length<10)?0:1) ;$i++){
+                        if($y>0){
+                            
+                                $this->array2[$x+$i][$y-1]=-1;
+                        }
+                        if($y<9) {
+                            
+                            $this->array2[$x+$i][$y+1]=-1;
+                        }
+                        }
+                    if($x>0){
+                        
+                        $this->array2[$x-1][$y]=-1;
+                    } 
+                    if($x+$length<10){
+                        
+                        $this->array2[$x+$length][$y]=-1;
+                    } 
+        
+                    } 
+        
+                    else{
+                        for ($i = (($y)>0?-1:0); $i<= $length -(($y+$length<10)?0:1) ;$i++){
+                        if($x>0){
+                                
+                                $this->array2[$x-1][$y+$i]=-1;
+                        } 
+                        if($x<9){
+                                
+                                $this->array2[$x+1][$y+$i]=-1;
+                        } 
+                        }
+                    if($y>0){
+                        $this->array2[$x][$y-1]=-1;
+                    } 
+                    if($y+$length<10) {
+                        
+                        $this->array2[$x][$y+$length]=-1;
+                    }
+                    }
+                }
+
+
+
+
+
+            }
+            for($i = 0; $i<10; $i++){
+                for($j = 0; $j<10; $j++){
+                    if($this->array2[$i][$j] == -1){
+                        $this->array2[$i][$j]=0;
+                    }
+                }
+            }
+            print_r($this->array2);
+            print_r($this->ships2);
+
+
+
+
+        }
+
+
+
+        else{
+            $player2->close();
+        }
     }
     
     public function Connection1()
