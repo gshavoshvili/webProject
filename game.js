@@ -21,7 +21,9 @@ var States = {
     "CONNECTED_WAITING" : 1,
     "SETUP" : 2,
     "SETUP_WAITING":3,
-    "PLAYING":4
+    "PLAYING":4,
+    "WON":5,
+    "LOST":6
 };
 
 var state = States.CONNECTING;
@@ -364,7 +366,14 @@ conn.onmessage = function(e) {
         state=States.CONNECTED_WAITING;
         console.log('connected');
     }
-    // UWIN ULOSE
+    else if (e.data == 'UWIN'){
+        state=States.WON;
+        console.log('VICTORY!');
+    }
+    else if (e.data == 'ULOSE'){
+        state=States.LOST;
+        console.log('HEROIC DEFEAT!');
+    }
     else if (state = States.PLAYING){
         var arr = JSON.parse(e.data);
         console.log(arr);
@@ -420,8 +429,11 @@ function clickHandler(e){
         var y = e.offsetY-250.5;
         var gridX = Math.floor(x/cellWidth);
         var gridY = Math.floor(y/cellWidth);
-        var click = [gridX,gridY];
-        conn.send(JSON.stringify(click));
+        if (enemyField[gridX][gridY]==0){
+            var click = [gridX,gridY];
+            conn.send(JSON.stringify(click));
+        }
+        
     }
     
 }
