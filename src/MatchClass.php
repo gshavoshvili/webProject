@@ -1,37 +1,47 @@
 <?php
 namespace MyApp;
-class Match
-{
-    public $player1;
-    public $player2;
-    
-    public $ship4 = array(array(0, 0, 'allive'), array(0, 1, 'allive'), array(0, 2, 'allive'), array(0, 3, 'allive'));
-    
-    $ship4 = array(     
-        array(0,0,'allive'),
-        array(0,1,'allive'),
-        array(0,2,'allive'),
-        array(0,3,'allive')
-    );
 
-    /*public $array1 = array(
-    array($ship4,$ship4,$ship4,$ship4,0,0,0,0,0,0),
-    array(0,0,0,0,0,0,0,0,0,0),
-    array(0,0,0,0,0,0,0,0,0,0),
-    array(0,0,0,0,0,0,0,0,0,0),
-    array(0,0,0,0,0,0,0,0,0,0),
-    array(0,0,0,0,0,0,0,0,0,0),
-    array(0,0,0,0,0,0,0,0,0,0),
-    array(0,0,0,0,0,0,0,0,0,0),
-    array(0,0,0,0,0,0,0,0,0,0),
-    array(0,0,0,0,0,0,0,0,0,0)
-    );*/
-    public $player1status = false;
-    public $player2status = false;
+abstract class States
+{
+    const CONNECTING = 0;
+    const SETUP = 1;
+    const PLAYING = 2;
+    const OVER = 3;
+}
+
+
+
+class Match{
+public $state;
+public $player1;
+public $player2;
+public $ship4 = array(array(0, 0, 'allive'), array(0, 1, 'allive'), array(0, 2, 'allive'), array(0, 3, 'allive'));
     
-    public function setFirstPlayer($conn)
-    {
-        $this->player1 = $conn;
+    
+/*public $array1 = array(
+array($ship4,$ship4,$ship4,$ship4,0,0,0,0,0,0),
+array(0,0,0,0,0,0,0,0,0,0),
+array(0,0,0,0,0,0,0,0,0,0),
+array(0,0,0,0,0,0,0,0,0,0),
+array(0,0,0,0,0,0,0,0,0,0),
+array(0,0,0,0,0,0,0,0,0,0),
+array(0,0,0,0,0,0,0,0,0,0),
+array(0,0,0,0,0,0,0,0,0,0),
+array(0,0,0,0,0,0,0,0,0,0),
+array(0,0,0,0,0,0,0,0,0,0)
+);*/
+public $array2 = array();
+public $player1status = false;
+public $player2status = false;
+
+
+    function __construct(){
+        $this->state = States::SETUP;
+    }
+
+    public function setFirstPlayer($conn){
+        
+        $this->player1=$conn;
         echo 'player1';
     }
     
@@ -107,8 +117,8 @@ class Match
     {   $counter =0;
 
         foreach($ship as $kek){
-            for($i = 0;$i<10;i++){
-                if ($kek[i] == 0 || $kek[i] == 1 || $kek[i] == -1){
+            for($i = 0;$i<10;$i++){
+                if ($kek[$i] == 0 || $kek[$i] == 1 || $kek[$i] == -1){
                     $counter++;
                 }
             }
