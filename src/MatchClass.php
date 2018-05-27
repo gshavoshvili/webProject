@@ -17,42 +17,19 @@ public $player1;
 public $player2;
 public $ships1;
 public $ships2;
-public $ship4 = array(array(0, 0, 'allive'), array(0, 1, 'allive'), array(0, 2, 'allive'), array(0, 3, 'allive'));
+
 public $turn;
-    
-/*public $this->array1 = array(
-array($ship4,$ship4,$ship4,$ship4,0,0,0,0,0,0),
-array(0,0,0,0,0,0,0,0,0,0),
-array(0,0,0,0,0,0,0,0,0,0),
-array(0,0,0,0,0,0,0,0,0,0),
-array(0,0,0,0,0,0,0,0,0,0),
-array(0,0,0,0,0,0,0,0,0,0),
-array(0,0,0,0,0,0,0,0,0,0),
-array(0,0,0,0,0,0,0,0,0,0),
-array(0,0,0,0,0,0,0,0,0,0),
-array(0,0,0,0,0,0,0,0,0,0)
-);*/
+public $player1FieldReady;
+public $player2FieldReady;    
 
-/*public $array2 = array(
-array($ship4,$ship4,$ship4,$ship4,0,0,0,0,0,0),
-array(0,0,0,0,0,0,0,0,0,0),
-array(0,0,0,0,0,0,0,0,0,0),
-array(0,0,0,0,0,0,0,0,0,0),
-array(0,0,0,0,0,0,0,0,0,0),
-array(0,0,0,0,0,0,0,0,0,0),
-array(0,0,0,0,0,0,0,0,0,0),
-array(0,0,0,0,0,0,0,0,0,0),
-array(0,0,0,0,0,0,0,0,0,0),
-array(0,0,0,0,0,0,0,0,0,0)
-);*/
-
-public $array2 = array();
-public $player1status = false;
-public $player2status = false;
+public $player1status = false; // TO BE CHANGED
+public $player2status = false; // TO BE CHANGED
 
 
     function __construct(){
         $this->state = States::SETUP;
+        $this->player1FieldReady = false;
+        $this->player2FieldReady = false;    
     }
 
     public function setFirstPlayer($conn){
@@ -105,7 +82,8 @@ public $player2status = false;
             
             }
             else {
-                //Можем пожаловаться его маме
+                $conn->close();
+                return;
             }
         }
 
@@ -145,7 +123,8 @@ public $player2status = false;
             
             }
             else {
-                //Можем пожаловаться его маме
+                $conn->close();
+                return;
             }
         }
     }
@@ -216,7 +195,7 @@ public $player2status = false;
                     }
                 }
                 if(!$canPlace){
-                    $player1->close();
+                    $player1->close();return;
                 }
                 else{
                     $this->ships1[]=$shipArr;
@@ -261,6 +240,11 @@ public $player2status = false;
                         $this->array1[$x][$y+$length]=-1;
                     }
                     }
+
+
+
+
+
                 }
 
 
@@ -277,11 +261,16 @@ public $player2status = false;
                 }
             }
 
-
+            $this->player1FieldReady = true;
             print_r($this->array1);
             print_r($this->ships1);
 
-
+            if($this->player2FieldReady){
+                GameStart();
+            }
+            else{
+                $player1->send("GOOD");
+            }
 
 
         }
@@ -289,7 +278,7 @@ public $player2status = false;
 
 
         else{
-            $player1->close();
+            $player1->close();return;
         }
 
     }
@@ -345,7 +334,7 @@ public $player2status = false;
                     }
                 }
                 if(!$canPlace){
-                    $player2->close();
+                    $player2->close();return;
                 }
                 else{
                     $this->ships2[]=$shipArr;
@@ -404,9 +393,15 @@ public $player2status = false;
                     }
                 }
             }
+            $this->player2FieldReady = true;
             print_r($this->array2);
             print_r($this->ships2);
-
+            if($this->player1FieldReady){
+                GameStart();
+            }
+            else{
+                $player2->send("GOOD");
+            }
 
 
 
@@ -415,7 +410,7 @@ public $player2status = false;
 
 
         else{
-            $player2->close();
+            $player2->close();return;
         }
     }
     

@@ -339,7 +339,16 @@ conn.onopen = function(e) {
 
 conn.onmessage = function(e) {
     if(e.data=='START'){
+        state=States.PLAYING;
+        myTurn = false;
+    }
+    else if(e.data=='USTART'){
+        state=States.PLAYING;
         myTurn=true;
+
+    }
+    else if (e.data == 'GOOD'){
+        state=States.SETUP_WAITING;
     }
     else {
         console.log(e.data);
