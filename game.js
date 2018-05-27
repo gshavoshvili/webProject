@@ -17,13 +17,14 @@ var crossHalfWidth = 9;
 
 
 var States = {
-    "CONNECTED" : 0,
-    "SETUP" : 1,
-    "SETUP_WAITING":2,
-    "PLAYING":3
+    "CONNECTING" : 0,
+    "CONNECTED_WAITING" : 1,
+    "SETUP" : 2,
+    "SETUP_WAITING":3,
+    "PLAYING":4
 };
 
-var state = States.SETUP;
+var state = States.CONNECTING;
 console.log(state);
 
 var myTurn = false;
@@ -167,25 +168,29 @@ function randomize(){
 
 canvas.addEventListener('mousedown',mouseDownHandler, false);
 function mouseDownHandler(e){
-    // If pressed on a ship, start dragging it 
-    for(var i = 0; i<ships.length;i++){
-        var ship=ships[i];
-        if (e.offsetX>ship.pos[0] && e.offsetX<ship.pos[0]+ship.width && e.offsetY>ship.pos[1] && e.offsetY<ship.pos[1]+ship.height){
-            dragging=ship;
-            dragOffset=[e.offsetX-ship.pos[0],e.offsetY-ship.pos[1]];
-            dragging.around.forEach(function(e){
-                myField[e[0]][e[1]]++;
-            });
-            dragging.around=[];
-            dragging.cells.forEach(function(e){
-                myField[e[0]][e[1]]=0;
-            });
-            dragging.placed = false;
-            
-            break;
+    
+    if(state == States.SETUP){
+
+        // If pressed on a ship, start dragging it 
+
+        for(var i = 0; i<ships.length;i++){
+            var ship=ships[i];
+            if (e.offsetX>ship.pos[0] && e.offsetX<ship.pos[0]+ship.width && e.offsetY>ship.pos[1] && e.offsetY<ship.pos[1]+ship.height){
+                dragging=ship;
+                dragOffset=[e.offsetX-ship.pos[0],e.offsetY-ship.pos[1]];
+                dragging.around.forEach(function(e){
+                    myField[e[0]][e[1]]++;
+                });
+                dragging.around=[];
+                dragging.cells.forEach(function(e){
+                    myField[e[0]][e[1]]=0;
+                });
+                dragging.placed = false;
+                
+                break;
+            }
         }
     }
-    
 }
 canvas.addEventListener('mousemove',mouseMoveHandler, false);
 function mouseMoveHandler(e){
@@ -293,7 +298,7 @@ var alreadyRotated = false;
 canvas.addEventListener('keydown',keyDownHandler, false);
 function keyDownHandler(e){
     if(e.code == 'KeyR'){
-        if(!alreadyRotated && dragging!=null){
+        if(state == States.SETUP && !alreadyRotated && dragging!=null){
             rotateShip(dragging);
             mouseMoveHandler({offsetX:mousePosition.x, offsetY:mousePosition.y});
             alreadyRotated=true;
@@ -303,10 +308,10 @@ function keyDownHandler(e){
 }
 canvas.addEventListener('keyup',keyUpHandler, false);
 function keyUpHandler(e){
-    if(e.code == 'KeyR'){
+    if(state == States.SETUP && e.code == 'KeyR'){
         alreadyRotated=false;
     }
-    else if (e.code == 'KeyF'){
+    else if (state == States.SETUP && e.code == 'KeyF'){
         randomize();
     }
     else if (state == States.SETUP && e.code == 'KeyS'){
@@ -350,6 +355,12 @@ conn.onmessage = function(e) {
     else if (e.data == 'GOOD'){
         state=States.SETUP_WAITING;
     }
+    else if (e.data == 'SETUP'){
+        state=States.SETUP;
+    }
+    else if (e.data == 'CONNECTED'){
+        state=States.CONNECTED_WAITING;
+    }
     else {
         console.log(e.data);
     }
@@ -368,9 +379,9 @@ enemyField = [
     [0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,3,0,0],
-    [0,0,0,0,0,0,0,3,0,0],
-    [0,0,0,0,0,0,0,3,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0]
     ];
@@ -378,25 +389,16 @@ enemyField = [
 
 canvas.addEventListener("click", clickHandler, false);
 function clickHandler(e){
-    if (e.offsetX>enemyFieldXOffset && e.offsetX<enemyFieldXOffset+250 && e.offsetY>250.5 && e.offsetY<500.5){
+    if (state == States.PLAYING && myTurn && e.offsetX>enemyFieldXOffset && e.offsetX<enemyFieldXOffset+250 && e.offsetY>250.5 && e.offsetY<500.5){
         var x = e.offsetX-enemyFieldXOffset;
         var y = e.offsetY-250.5;
         var gridX = Math.floor(x/cellWidth);
         var gridY = Math.floor(y/cellWidth);
-        if (enemyField[gridX][gridY] == -1){
-            enemyField[gridX][gridY] = 2;
-        }
-        else {
-            enemyField[gridX][gridY] = -1;
-            }
-        console.log(enemyField);
+        var click = [e.offsetX,e.offsetY];
+        conn.send(JSON.stringify(click));
+        myTurn=false;
     }
-    if(myTurn) {
-    var click = [e.offsetX,e.offsetY];
-    conn.send(JSON.stringify(click));
-    clicked.push(click);
-    myTurn=false;
-    }
+    
 }
 
 
@@ -608,7 +610,17 @@ function drawCross(centerX,centerY,color){
 function draw(){
 
     drawBG();
-    drawMyField();
+    
+    if(true||state==States.CONNECTED_WAITING || state==States.SETUP_WAITING){
+        ctx.font = "32px Arial";
+        ctx.fillStyle="darkblue";
+        ctx.fillText("Waiting for the opponent...",178,300);
+    }
+
+    if(state != States.CONNECTING){
+        drawMyField();
+    }
+    
 
     if(state == States.PLAYING){
         drawEnemyField();

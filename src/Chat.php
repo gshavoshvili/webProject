@@ -39,7 +39,7 @@ class Chat implements MessageComponentInterface {
             if(isset($username) && isset($match_link)){
                 echo $match_link;
                 echo $username;
-                $match_query = "SELECT c.username as creator, o.username as opponent from matches m left outer join users c on m.creator_id = c.id left outer join users o on m.opponent_id = o.id where m.match_link = '$match_link'";
+                $match_query = "SELECT c.username as creator, o.username as opponent from matches m left outer join users c on m.creator_id = c.id left outer join users o on m.opponent_id = o.id where m.match_link = '$match_link' LIMIT 1";
                 $match_query_result = mysqli_query($db, $match_query);
                 $match_array = mysqli_fetch_assoc($match_query_result);
                 echo 'dddd';
@@ -49,6 +49,10 @@ class Chat implements MessageComponentInterface {
                     if(!isset($this->matches[$match_link])){
                         $match = new Match;
                         $this->matches[$match_link] = $match;
+                        $this->connections[$from->resourceId] = $match;
+                    }
+                    else{
+                        $match = $this->matches[$match_link];
                         $this->connections[$from->resourceId] = $match;
                     }
 

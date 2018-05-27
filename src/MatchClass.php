@@ -1,7 +1,7 @@
 <?php
 namespace MyApp;
-//$player1->send("i'm here");
-//$player2->send("i'm here");
+//$this->player1->send("i'm here");
+//$this->player2->send("i'm here");
 abstract class States
 {
     const CONNECTING = 0;
@@ -36,18 +36,35 @@ public $player2status = false; // TO BE CHANGED
     public function setFirstPlayer($conn){
         
         $this->player1=$conn;
-        echo 'player1';
+        
+        if(isset($this->player2)){
+            $this->state = States::SETUP;
+            $this->player1->send("SETUP");
+            $this->player2->send("SETUP");
+        }
+        else{
+            $this->player1->send("CONNECTED");
+        }
+
     }
     
     public function setSecondPlayer($conn)
     {
         $this->player2 = $conn;
-        echo 'player2';
+
+        if(isset($this->player1)){
+            $this->state = States::SETUP;
+            $this->player1->send("SETUP");
+            $this->player2->send("SETUP");
+        }
+        else{
+            $this->player2->send("CONNECTED");
+        }
     }
     
     public function Shot($x, $y, $conn)
     {   
-            if($conn==$player1){    //player1 plays on turn 0
+            if($conn==$this->player1){    //player1 plays on turn 0
                 
                 if ($turn == 0){
                     
@@ -78,7 +95,7 @@ public $player2status = false; // TO BE CHANGED
                         //this ship is dead, send to JS
                         
                     }
-                    WinCheck();
+                    $this->WinCheck();
                 }
             
             }
@@ -88,7 +105,7 @@ public $player2status = false; // TO BE CHANGED
             }
         }
 
-            if($conn==$player2){    //player2 plays on turn 1
+            if($conn==$this->player2){    //player2 plays on turn 1
                     
                 if ($turn == 1){
                     
@@ -119,7 +136,7 @@ public $player2status = false; // TO BE CHANGED
                         //this ship is dead, send to JS
                         
                     }
-                    WinCheck();
+                    $this->WinCheck();
                 }
             
             }
@@ -145,13 +162,14 @@ public $player2status = false; // TO BE CHANGED
         
         $turn = rand(0,1);
         if($turn==0){
-            $player1->send("USTART");
-            $player2->send("START");
+            $this->player1->send("USTART");
+            $this->player2->send("START");
         }
         if($turn==1){
-            $player2->send("USTART");
-            $player1->send("START");
-        }     
+            $this->player2->send("USTART");
+            $this->player1->send("START");
+        }
+        $this->state = States::PLAYING;     
     }
     
     public function FirstPlayerField($json)
@@ -205,7 +223,7 @@ public $player2status = false; // TO BE CHANGED
                     }
                 }
                 if(!$canPlace){
-                    $player1->close();return;
+                    $this->player1->close();return;
                 }
                 else{
                     $this->ships1[]=$shipArr;
@@ -276,10 +294,10 @@ public $player2status = false; // TO BE CHANGED
             print_r($this->ships1);
 
             if($this->player2FieldReady){
-                GameStart();
+                $this->GameStart();
             }
             else{
-                $player1->send("GOOD");
+                $this->player1->send("GOOD");
             }
 
 
@@ -288,7 +306,7 @@ public $player2status = false; // TO BE CHANGED
 
 
         else{
-            $player1->close();return;
+            $this->player1->close();return;
         }
 
     }
@@ -344,7 +362,7 @@ public $player2status = false; // TO BE CHANGED
                     }
                 }
                 if(!$canPlace){
-                    $player2->close();return;
+                    $this->player2->close();return;
                 }
                 else{
                     $this->ships2[]=$shipArr;
@@ -407,10 +425,10 @@ public $player2status = false; // TO BE CHANGED
             print_r($this->array2);
             print_r($this->ships2);
             if($this->player1FieldReady){
-                GameStart();
+                $this->GameStart();
             }
             else{
-                $player2->send("GOOD");
+                $this->player2->send("GOOD");
             }
 
 
@@ -420,7 +438,7 @@ public $player2status = false; // TO BE CHANGED
 
 
         else{
-            $player2->close();return;
+            $this->player2->close();return;
         }
     }
     

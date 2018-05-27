@@ -13,18 +13,19 @@
     // checks if $_GET link exists in DB
     if (isset($match_link_array['match_link'])) {
     // Desides who is connected user, creator of the game or his opponent    
-        $username_check_query = "SELECT username from users, matches WHERE users.username='$username' AND users.id = matches.id AND matches.match_link = '$match_link' LIMIT 1 ";
+        $username_check_query = "SELECT c.username as creator, o.username as opponent from matches m left outer join users c on m.creator_id = c.id left outer join users o on m.opponent_id = o.id where m.match_link = '$match_link' LIMIT 1 ";
         $username_result = mysqli_query($db,$username_check_query);
         $username_array = mysqli_fetch_assoc($username_result);
-        if (isset($username_array['username'])) { 
-            
+        echo 123;
+        if ($username_array['creator'] == $username) { 
         }
-        else {
-
+        elseif (!isset($username_array['opponent'])) {
+        
         $opponent_fill_query = "UPDATE matches m SET opponent_id=(SELECT users.id FROM users WHERE users.username = '$username' and users.id = m.id) WHERE m.match_link = '$match_link'";      
-
+        mysqli_query($db,$opponent_fill_query);    
         }
 
+        else {header("Location: index.php"); die();}
 
     }
 
