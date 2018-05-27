@@ -535,7 +535,7 @@ public $player2status = false; // TO BE CHANGED
                 }
             }
             if ($counter == 0){
-                echo "1 won! congrats!";
+                $this->player1->send("UWIN");
             }
         }
         if($this->turn==1){
@@ -552,13 +552,13 @@ public $player2status = false; // TO BE CHANGED
                 }
             }
             if ($counter == 0){
-                echo "2 won, I wasn't a fan :(";
+                $this->player2->send("ULOSE");
             }
         }
     }
     public function GameStatus()
     {
-        
+        $this->state = States::OVER;
     }
     
 }
