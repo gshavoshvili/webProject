@@ -28,7 +28,7 @@ class Chat implements MessageComponentInterface {
         $player;
         $db = $this->ds;
         $json = json_decode($msg);
-        
+        print_r($json);
         if($this->connections[$from->resourceId]===null){
             $unsafe_username = $json->username;
             $unsafe_match_link = $json->match;
@@ -53,13 +53,13 @@ class Chat implements MessageComponentInterface {
                     }
 
                     if($username == $match_array['creator'] && !isset($this->matches[$match_link]->player1) ){
-                        echo 1;
-                        //$this->matches[$match_link]->setFirstPlayer($from);
+                        
+                        $match->setFirstPlayer($from);
                     }
 
                     elseif($username == $match_array['opponent'] && !isset($this->matches[$match_link]->player2)){
-                        echo 2;
-                        //$this->matches[$match_link]->setSecondPlayer($from);
+
+                        $match->setSecondPlayer($from);
                     }
 
                     else{
@@ -94,7 +94,9 @@ class Chat implements MessageComponentInterface {
             if ($match->state==States::SETUP){
                 echo "He sent the list of the player's ships\n";
                 if($player==0){
+                    echo 1;
                     $match->FirstPlayerField($json);
+                    
                 }
                 else{
                     $match->SecondPlayerField($json);
