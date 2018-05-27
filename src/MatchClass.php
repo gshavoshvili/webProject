@@ -1,6 +1,7 @@
 <?php
 namespace MyApp;
-
+//$player1->send("i'm here");
+//$player2->send("i'm here");
 abstract class States
 {
     const CONNECTING = 0;
@@ -141,7 +142,16 @@ public $player2status = false; // TO BE CHANGED
     */
     
     public function GameStart(){
+        
         $turn = rand(0,1);
+        if($turn==0){
+            $player1->send("USTART");
+            $player2->send("START");
+        }
+        if($turn==0){
+            $player2->send("USTART");
+            $player1->send("START");
+        }     
     }
     
     public function FirstPlayerField($json)
