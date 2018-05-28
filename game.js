@@ -382,7 +382,7 @@ conn.onmessage = function(e) {
         state=States.LOST;
         console.log('HEROIC DEFEAT!');
     }
-    else if (state == States.PLAYING){
+    else if (state == States.PLAYING || state == States.LOST || state == States.WON){
         var arr = JSON.parse(e.data);
         console.log(arr);
         arr.forEach( function(order) {

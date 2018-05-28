@@ -107,7 +107,7 @@ public $player2status = false; // TO BE CHANGED
 
                         }
                         
-                        if ($kek[2] == 'dead') {
+                        if ($kek[2] == 'dead'  || $kek[2] == 'dot') {
                             
                             $counter++;
                             echo '++\n';
@@ -121,8 +121,8 @@ public $player2status = false; // TO BE CHANGED
                         
                         
                         foreach($ship as &$kek){
-                            $arr1[] = array($kek[0],$kek[1],3);
-                            $arr2[] = array($kek[0],$kek[1],13);
+                            $arr2[] = array($kek[0],$kek[1],(($kek[2]=="dead")?13:-1));
+                            $arr1[] = array($kek[0],$kek[1],(($kek[2]=="dead")?3:-1));
                         }
                        
                         $this->WinCheck();
@@ -170,7 +170,7 @@ public $player2status = false; // TO BE CHANGED
                             print_r($ship2);
                         }
                         
-                        if ($kek[2] == 'dead') {
+                        if ($kek[2] == 'dead' || $kek[2] == 'dot') {
                             
                             $counter++;
                             
@@ -183,8 +183,8 @@ public $player2status = false; // TO BE CHANGED
                         echo "He sunk the ship!\n";
                         print_r($ship2);
                         foreach($ship2 as &$kek){
-                            $arr1[] = array($kek[0],$kek[1],13);
-                            $arr2[] = array($kek[0],$kek[1],3);
+                            $arr1[] = array($kek[0],$kek[1],(($kek[2]=="dead")?13:-1));
+                            $arr2[] = array($kek[0],$kek[1],(($kek[2]=="dead")?3:-1));
                         }
                         $this->WinCheck();
                         
@@ -287,31 +287,32 @@ public $player2status = false; // TO BE CHANGED
                         break;
                     }
                 }
-                $this->ships1[$n]=$shipArr;
-                for ($i = 0; $i<count($shipArr); $i++){
-                    $this->array1[$shipArr[$i][0]][$shipArr[$i][1]]=&$this->ships1[$n];
-                }
+                
                 if(!$canPlace){
                     $this->player1->close();return;
                 }
                 else{
+                    $this->ships1[$n]=$shipArr;
+                for ($i = 0; $i<count($shipArr); $i++){
+                    $this->array1[$shipArr[$i][0]][$shipArr[$i][1]]=&$this->ships1[$n];
+                }
                     if($rot==0){
                         for ($i = ($x>0?-1:0); $i<= $length -(($x+$length<10)?0:1) ;$i++){
                            if($y>0){
-                             
+                                $this->ships1[$n][]=array($x+$i,$y-1,'dot');
                                 $this->array1[$x+$i][$y-1]=-1;
                            }
                            if($y<9) {
-                               
+                            $this->ships1[$n][]=array($x+$i,$y+1,'dot');
                                $this->array1[$x+$i][$y+1]=-1;
                            }
                         }
                     if($x>0){
-                        
+                        $this->ships1[$n][]=array($x-1,$y,'dot');
                         $this->array1[$x-1][$y]=-1;
                     } 
                     if($x+$length<10){
-                        
+                        $this->ships1[$n][]=array($x+$length,$y,'dot');
                         $this->array1[$x+$length][$y]=-1;
                     } 
         
@@ -320,25 +321,26 @@ public $player2status = false; // TO BE CHANGED
                     else{
                         for ($i = (($y)>0?-1:0); $i<= $length -(($y+$length<10)?0:1) ;$i++){
                            if($x>0){
-                                
+                            $this->ships1[$n][]=array($x-1,$y+$i,'dot');
                                 $this->array1[$x-1][$y+$i]=-1;
                            } 
                            if($x<9){
-                                
+                                $this->ships1[$n][]=array($x+1,$y+$i,'dot');
                                 $this->array1[$x+1][$y+$i]=-1;
                            } 
                         }
                     if($y>0){
+                        $this->ships1[$n][]=array($x,$y-1,'dot');
                         $this->array1[$x][$y-1]=-1;
                     } 
                     if($y+$length<10) {
-                        
+                        $this->ships1[$n][]=array($x,$y+$length,'dot');
                         $this->array1[$x][$y+$length]=-1;
                     }
                     }
 
 
-
+                    
 
 
                 }
@@ -428,56 +430,57 @@ public $player2status = false; // TO BE CHANGED
                         break;
                     }
                 }
-                $this->ships2[$n]=$shipArr;
-                for ($i = 0; $i<count($shipArr); $i++){
-                    $this->array2[$shipArr[$i][0]][$shipArr[$i][1]]=&$this->ships2[$n];
-                }
+                
                 if(!$canPlace){
                     $this->player2->close();return;
                 }
                 else{
-                    
-                    if($rot==0){
-                        for ($i = ($x>0?-1:0); $i<= $length -(($x+$length<10)?0:1) ;$i++){
-                        if($y>0){
-                            
-                                $this->array2[$x+$i][$y-1]=-1;
-                        }
-                        if($y<9) {
-                            
-                            $this->array2[$x+$i][$y+1]=-1;
-                        }
-                        }
-                    if($x>0){
-                        
-                        $this->array2[$x-1][$y]=-1;
-                    } 
-                    if($x+$length<10){
-                        
-                        $this->array2[$x+$length][$y]=-1;
-                    } 
-        
-                    } 
-        
-                    else{
-                        for ($i = (($y)>0?-1:0); $i<= $length -(($y+$length<10)?0:1) ;$i++){
-                        if($x>0){
-                                
-                                $this->array2[$x-1][$y+$i]=-1;
-                        } 
-                        if($x<9){
-                                
-                                $this->array2[$x+1][$y+$i]=-1;
-                        } 
-                        }
-                    if($y>0){
-                        $this->array2[$x][$y-1]=-1;
-                    } 
-                    if($y+$length<10) {
-                        
-                        $this->array2[$x][$y+$length]=-1;
+                    $this->ships2[$n]=$shipArr;
+                for ($i = 0; $i<count($shipArr); $i++){
+                    $this->array2[$shipArr[$i][0]][$shipArr[$i][1]]=&$this->ships2[$n];
+                }
+                if($rot==0){
+                    for ($i = ($x>0?-1:0); $i<= $length -(($x+$length<10)?0:1) ;$i++){
+                       if($y>0){
+                            $this->ships2[$n][]=array($x+$i,$y-1,'dot');
+                            $this->array2[$x+$i][$y-1]=-1;
+                       }
+                       if($y<9) {
+                        $this->ships2[$n][]=array($x+$i,$y+1,'dot');
+                           $this->array2[$x+$i][$y+1]=-1;
+                       }
                     }
+                if($x>0){
+                    $this->ships2[$n][]=array($x-1,$y,'dot');
+                    $this->array2[$x-1][$y]=-1;
+                } 
+                if($x+$length<10){
+                    $this->ships2[$n][]=array($x+$length,$y,'dot');
+                    $this->array2[$x+$length][$y]=-1;
+                } 
+    
+                } 
+    
+                else{
+                    for ($i = (($y)>0?-1:0); $i<= $length -(($y+$length<10)?0:1) ;$i++){
+                       if($x>0){
+                        $this->ships2[$n][]=array($x-1,$y+$i,'dot');
+                            $this->array2[$x-1][$y+$i]=-1;
+                       } 
+                       if($x<9){
+                            $this->ships2[$n][]=array($x+1,$y+$i,'dot');
+                            $this->array2[$x+1][$y+$i]=-1;
+                       } 
                     }
+                if($y>0){
+                    $this->ships2[$n][]=array($x,$y-1,'dot');
+                    $this->array2[$x][$y-1]=-1;
+                } 
+                if($y+$length<10) {
+                    $this->ships2[$n][]=array($x,$y+$length,'dot');
+                    $this->array2[$x][$y+$length]=-1;
+                }
+                }
                 }
 
 
