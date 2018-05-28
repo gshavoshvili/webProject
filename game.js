@@ -1,8 +1,3 @@
-/*
-*
-* Stuff outside the canvas gets selected on click and drag (multiple clicks)
-*
-*/
 
 //Game variables
 var canvas = document.getElementById("Canvas");
@@ -332,6 +327,16 @@ function sendField(){
     conn.send(JSON.stringify(data));
 }
 
+function clearMisses(){
+    for(var i = 0; i<10; i++){
+        for (var j = 0; j<10; j++){
+            if(myField[i][j]<0){
+                myField[i][j]=0;
+            }
+        }
+    }
+}
+
 //WebSocket connection
 var conn = new WebSocket('ws://localhost:8080');
 var info = {
@@ -347,16 +352,19 @@ conn.onopen = function(e) {
 conn.onmessage = function(e) {
     if(e.data=='START'){
         state=States.PLAYING;
+        clearMisses();
         myTurn = false;
         console.log('enemy starts');
     }
     else if(e.data=='USTART'){
         state=States.PLAYING;
+        clearMisses();
         myTurn=true;
         console.log('I start');
     }
     else if (e.data == 'GOOD'){
         state=States.SETUP_WAITING;
+        clearMisses();
     }
     else if (e.data == 'SETUP'){
         state=States.SETUP;
@@ -655,7 +663,7 @@ function draw(){
     }
     
 
-    if(state == States.PLAYING){
+    if(state == States.PLAYING || state == States.WON || state == States.LOST){
         drawEnemyField();
     }
     if(state==States.CONNECTED_WAITING || state==States.SETUP_WAITING){
