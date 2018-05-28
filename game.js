@@ -672,7 +672,26 @@ function draw(){
         ctx.fillText("Waiting for the opponent...",178,150);
     }
 
-
+    if(state==States.WON){
+        ctx.font = "32px Arial";
+        ctx.fillStyle="darkblue";
+        ctx.fillText("Victory!",303,150);
+    }
+    if(state==States.LOST){
+        ctx.font = "32px Arial";
+        ctx.fillStyle="darkblue";
+        ctx.fillText("Defeat",283,150);
+    }
+    if(state==States.PLAYING && myTurn){
+        ctx.font = "32px Arial";
+        ctx.fillStyle="darkblue";
+        ctx.fillText("Your Turn",278,150);
+    }
+    if(state==States.PLAYING && !myTurn){
+        ctx.font = "32px Arial";
+        ctx.fillStyle="darkblue";
+        ctx.fillText("Enemy Turn",278,150);
+    }
     
     requestAnimationFrame(draw);
 }
