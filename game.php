@@ -1,3 +1,46 @@
+<?php 
+ session_start();
+ if(isset($_GET['match']) && isset($_SESSION['username'])){
+    //variables needed for future
+    $db = mysqli_connect('localhost', 'root', '', 'registration');
+    $match_link = $_GET['match'];
+    $username = $_SESSION['username'];
+    $isCreator = false;
+    //checking if sent ID is valid
+    $match_link_check_query = "SELECT match_link FROM matches WHERE match_link='$match_link' LIMIT 1";
+    $match_result = mysqli_query($db, $match_link_check_query);
+    $match_link_array = mysqli_fetch_assoc($match_result);
+    
+    // checks if $_GET link exists in DB
+    if (isset($match_link_array['match_link'])) {
+    // Desides who is connected user, creator of the game or his opponent    
+        $username_check_query = "SELECT c.username as creator, o.username as opponent from matches m left outer join users c on m.creator_id = c.id left outer join users o on m.opponent_id = o.id where m.match_link = '$match_link' LIMIT 1 ";
+        $username_result = mysqli_query($db,$username_check_query);
+        $username_array = mysqli_fetch_assoc($username_result);
+        if ($username_array['creator'] == $username) { 
+            $isCreator = true;
+        }
+        elseif (!isset($username_array['opponent'])) {
+        
+        $opponent_fill_query = "UPDATE matches m SET opponent_id=(SELECT users.id FROM users WHERE users.username = '$username') WHERE m.match_link = '$match_link'";      
+        mysqli_query($db,$opponent_fill_query);    
+        }
+
+        else {header("Location: ../index.php"); die();}
+
+    }
+
+    else {header("Location: ../index.php"); die();}
+
+    
+            
+ }
+ else {header("Location: ../index.php"); die();}
+
+
+
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,56 +48,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+    <style>
+    body{
+        background:grey;
+    }
+    </style>
 </head>
 <body>
-<canvas id="Canvas" width="600" height="600" style="border: 1px solid black"></canvas>
+    
+<!-- Tabindex to make it focusable -->
+<canvas tabindex="1" id="Canvas" width="700" height="600" style="border: 1px solid black"></canvas>
 <script>
-//Game variables
-var canvas = document.getElementById("Canvas");
-var ctx = canvas.getContext("2d");
-var clicked = [];
-var myTurn = false;
-
-//WebSocket connection
-var conn = new WebSocket('ws://localhost:8080');
-conn.onopen = function(e) {
-    console.log("Connection established!");
-    var i = 1;
-    //setInterval(function(){conn.send(i); i++;},100);
-};
-
-conn.onmessage = function(e) {
-    if(e.data=='START'){
-        myTurn=true;
-    }
-    else {
-        clicked.push(JSON.parse(e.data));
-        myTurn=true;
-    }
-    
-};
-    
-
-
-//Game logic
-canvas.addEventListener("click", clickHandler, false);
-function clickHandler(e){
-    if(myTurn) {
-    var click = [e.offsetX,e.offsetY];
-    conn.send(JSON.stringify(click));
-    clicked.push(click);
-    myTurn=false;
-    }
-}
-
-function draw(){
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    clicked.forEach(function(e){
-        ctx.fillRect(e[0],e[1],50,50);
-    })
-    requestAnimationFrame(draw);
-}
-draw();
+var username='<?php echo $username ?>';
+var match = '<?php echo $match_link ?>';
+<?php if ($isCreator) {echo 'prompt("Send this to a friend!", window.location);';}?>
 </script>
+<script src="../game.js"></script>
 </body>
 </html>
